@@ -1,18 +1,28 @@
 package com.example.demo.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
 public class JwtResponse {
     private String token;
-    private final String type = "Bearer";
+    private String type = "Bearer";
 
-    
+    // Single Constructor - Fixes the "already defined" error
     public JwtResponse(String accessToken) {
         this.token = accessToken;
+    }
+
+    // Getters and Setters
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 }
