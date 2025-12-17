@@ -78,11 +78,11 @@ public class SecurityConfig {
                 
                 .requestMatchers("/api/").authenticated() 
                 
-                // Any other request not explicitly matched above
+                
                 .anyRequest().authenticated()
             );
 
-        // Add the custom JWT filter before Spring Security's default filter
+        
         http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         
         // Set the custom authentication provider
