@@ -19,14 +19,14 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @Configuration
 @EnableWebSecurity
-@EnableMethodSecurity(prePostEnabled = true) // Enable method-level security for @PreAuthorize
+@EnableMethodSecurity(prePostEnabled = true) 
 public class SecurityConfig {
 
     private final CustomUserDetailsService userDetailsService;
     private final JwtAuthenticationEntryPoint unauthorizedHandler;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
-    // CONSTRUCTOR INJECTION
+    
     public SecurityConfig(
             CustomUserDetailsService userDetailsService,
             JwtAuthenticationEntryPoint unauthorizedHandler,
@@ -36,15 +36,13 @@ public class SecurityConfig {
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
     }
 
-    // --- BEANS ---
-
-    // 1. Password Encoder (Requirement for secure password storage)
+    
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
-    // 2. Authentication Provider
+    
     @Bean
     public DaoAuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
@@ -53,31 +51,31 @@ public class SecurityConfig {
         return authProvider;
     }
 
-    // 3. Authentication Manager (Required for AuthController login)
+    
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
         return authConfig.getAuthenticationManager();
     }
 
-    // 4. Security Filter Chain Configuration
+    
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            // Disable CSRF since the API is stateless and uses JWT tokens
+            
             .csrf(csrf -> csrf.disable())
             
-            // Set entry point for unauthorized requests
+            
             .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
             
-            // Set session management to stateless (no session cookies)
+            
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             
-            // Define authorization rules
+            
             .authorizeHttpRequests(auth -> auth
-                // Allow access to auth endpoints, status servlet, and swagger without authentication
+                
                 .requestMatchers("/auth/", "/status", "/swagger-ui/", "/v3/api-docs/").permitAll()
                 
-                // All other API endpoints require authentication (secured by JWT)
+                
                 .requestMatchers("/api/").authenticated() 
                 
                 // Any other request not explicitly matched above
