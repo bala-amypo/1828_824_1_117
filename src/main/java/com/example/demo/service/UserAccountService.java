@@ -28,6 +28,26 @@ public class UserAccountServiceImpl implements UserAccountService {
     public UserAccount getUserById(Long id) {
         return userAccountRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
     }
+    @Override
+    public UserAccount updateUserStatus(Long id, String status) {
+        UserAccount user = getUserById(id);
+        user.setStatus(status);
+        return userAccountRepository.save(user);
+    }
+
+    @Override
+    public List<UserAccount> getAllUsers() {
+        return userAccountRepository.findAll();
+    }
+
+    @Override
+    public UserAccount findByUsername(String username) {
+        return userAccountRepository.findByUsername(username);
+    }
+    @override 
+    public userAaccount findByUsername(String username){
+        return userAccountRepository.findByUsername(username);
+    }
 
     
 }
