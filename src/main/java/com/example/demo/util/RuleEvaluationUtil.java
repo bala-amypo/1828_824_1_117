@@ -14,7 +14,7 @@ public class RuleEvaluationUtil {
     private final PolicyRuleRepository policyRuleRepository;
     private final ViolationRecordRepository violationRecordRepository;
 
-    // CONSTRUCTOR INJECTION (Constraint 3)
+    
     public RuleEvaluationUtil(PolicyRuleRepository policyRuleRepository, 
                                 ViolationRecordRepository violationRecordRepository) {
         this.policyRuleRepository = policyRuleRepository;
