@@ -9,10 +9,6 @@ import org.springframework.context.annotation.Configuration;
 public class OpenApiConfig {
     @Bean
     public OpenAPI customOpenAPI() {
-        return new OpenAPI()
-                .info(new Info()
-                        .title("IT Policy Violation API")
-                        .version("1.0")
-                        .description("API for monitoring and detecting policy violations"));
+        return new OpenAPI().info(new Info().title("API").version("1.0"));
     }
 }
