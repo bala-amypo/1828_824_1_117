@@ -14,13 +14,13 @@ public class SimpleStatusServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException {
         
-        // Set response status to 200 OK
+        
         response.setStatus(HttpServletResponse.SC_OK);
         
-        // Set content type to plain text
+        
         response.setContentType("text/plain");
         
-        // Write the required body text
+        
         response.getWriter().write("Servlet Running");
     }
 }

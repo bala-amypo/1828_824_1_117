@@ -13,7 +13,7 @@ public class JwtUtil {
     private final long validityInMs;
     private final boolean isTestMode;
 
-    // CONSTRUCTOR INJECTION (Constraint 4)
+    
     public JwtUtil(@Value("${jwt.secret}") String secret, 
                    @Value("${jwt.validity}") long validityInMs,
                    @Value("${jwt.test-mode:false}") boolean isTestMode) {
@@ -48,7 +48,7 @@ public class JwtUtil {
             Jwts.parser().setSigningKey(secret).parseClaimsJws(token);
             return true;
         } catch (SignatureException | MalformedJwtException | ExpiredJwtException | UnsupportedJwtException | IllegalArgumentException ex) {
-            return isTestMode; // In test mode, we might allow bypass
+            return isTestMode; 
         }
     }
 }

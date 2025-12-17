@@ -10,5 +10,5 @@ public class PolicyRuleServiceImpl implements PolicyRuleService {
     public List<PolicyRule> getActiveRules() {
         return policyRuleRepository.findByActiveTrue();
     }
-    // ... other standard CRUD methods
+    
 }

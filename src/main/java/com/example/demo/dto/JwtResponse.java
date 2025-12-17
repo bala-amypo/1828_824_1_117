@@ -11,7 +11,7 @@ public class JwtResponse {
     private String token;
     private final String type = "Bearer";
 
-    // Constructor for just the token
+    
     public JwtResponse(String accessToken) {
         this.token = accessToken;
     }

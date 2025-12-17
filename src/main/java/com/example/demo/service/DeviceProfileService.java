@@ -28,7 +28,7 @@ public class DeviceProfileServiceImpl implements DeviceProfileService {
 
     @Override
     public List<DeviceProfile> getDevicesByUser(Long userId) {
-        // Assume repository has findByUserId
+       
         return deviceProfileRepository.findAll(); 
     }
 

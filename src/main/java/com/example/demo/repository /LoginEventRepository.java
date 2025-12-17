@@ -7,6 +7,6 @@ import java.util.List;
 
 @Repository
 public interface LoginEventRepository extends JpaRepository<LoginEvent, Long> {
-    // Note: Parameter naming follows your technical constraint
+   
     List<LoginEvent> findByUseridAndLoginStatus(Long userId, String loginStatus);
 }

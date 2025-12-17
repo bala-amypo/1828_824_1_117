@@ -20,7 +20,7 @@ public class LoginEventServiceImpl implements LoginEventService {
     @Override
     public LoginEvent recordLogin(LoginEvent event) {
         LoginEvent savedEvent = loginEventRepository.save(event);
-        // Trigger violation detection logic (Constraint 3)
+        
         ruleEvaluationUtil.evaluateLoginEvent(savedEvent);
         return savedEvent;
     }

@@ -12,5 +12,5 @@ public class RegisterRequest {
     private String username;
     private String password;
     private String email;
-    private String role; // Optional: Defaults to USER in controller if null
+    private String role; 
 }
