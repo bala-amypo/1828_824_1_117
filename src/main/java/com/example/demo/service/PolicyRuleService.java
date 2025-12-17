@@ -1,14 +1,10 @@
-@Service
-public class PolicyRuleServiceImpl implements PolicyRuleService {
-    private final PolicyRuleRepository policyRuleRepository;
+package com.example.demo.service;
 
-    public PolicyRuleServiceImpl(PolicyRuleRepository policyRuleRepository) {
-        this.policyRuleRepository = policyRuleRepository;
-    }
+import com.example.demo.entity.PolicyRule;
+import java.util.List;
 
-    @Override
-    public List<PolicyRule> getActiveRules() {
-        return policyRuleRepository.findByActiveTrue();
-    }
-    
+public interface PolicyRuleService {
+    PolicyRule createRule(PolicyRule rule);
+    List<PolicyRule> getAllRules();
+    List<PolicyRule> getActiveRules();
 }

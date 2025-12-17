@@ -1,20 +1,10 @@
-@Service
-public class ViolationRecordServiceImpl implements ViolationRecordService {
-    private final ViolationRecordRepository violationRecordRepository;
+package com.example.demo.service;
 
-    public ViolationRecordServiceImpl(ViolationRecordRepository violationRecordRepository) {
-        this.violationRecordRepository = violationRecordRepository;
-    }
+import com.example.demo.entity.ViolationRecord;
+import java.util.List;
 
-    @Override
-    public ViolationRecord markResolved(Long id) {
-        ViolationRecord record = violationRecordRepository.findById(id).orElseThrow();
-        record.setResolved(true);
-        return violationRecordRepository.save(record);
-    }
-
-    @Override
-    public List<ViolationRecord> getUnresolvedViolations() {
-        return violationRecordRepository.findByResolvedFalse();
-    }
+public interface ViolationRecordService {
+    ViolationRecord saveViolation(ViolationRecord record);
+    List<ViolationRecord> getViolationsByUserId(Long userId);
+    List<ViolationRecord> getAllViolations();
 }
