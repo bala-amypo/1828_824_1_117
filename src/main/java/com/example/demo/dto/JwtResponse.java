@@ -4,12 +4,12 @@ public class JwtResponse {
     private String token;
     private String type = "Bearer";
 
-    // Single Constructor - Fixes the "already defined" error
+    
     public JwtResponse(String accessToken) {
         this.token = accessToken;
     }
 
-    // Getters and Setters
+    
     public String getToken() {
         return token;
     }

@@ -4,7 +4,9 @@ import com.example.demo.entity.UserAccount;
 import java.util.List;
 
 public interface UserAccountService {
-    UserAccount saveUser(UserAccount user);
+    UserAccount createUser(UserAccount user); // Changed from saveUser to createUser
     UserAccount findByUsername(String username);
+    UserAccount getUserById(Long id);
+    UserAccount updateUserStatus(Long id, String status);
     List<UserAccount> getAllUsers();
 }
