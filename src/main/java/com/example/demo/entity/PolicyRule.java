@@ -1,12 +1,11 @@
 package com.example.demo.entity;
 
 import jakarta.persistence.*;
-import lombok.*;
 
 @Entity
 @Table(name = "policy_rules")
-@Data
 public class PolicyRule {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -23,4 +22,66 @@ public class PolicyRule {
     private String conditionsJson;
 
     private Boolean active = true;
+
+    // 1. Default No-Args Constructor
+    public PolicyRule() {
+    }
+
+    // 2. Parameterized Constructor
+    public PolicyRule(String ruleCode, String description, String severity, String conditionsJson, Boolean active) {
+        this.ruleCode = ruleCode;
+        this.description = description;
+        this.severity = severity;
+        this.conditionsJson = conditionsJson;
+        this.active = active != null ? active : true;
+    }
+
+    // 3. Getters and Setters
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getRuleCode() {
+        return ruleCode;
+    }
+
+    public void setRuleCode(String ruleCode) {
+        this.ruleCode = ruleCode;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getSeverity() {
+        return severity;
+    }
+
+    public void setSeverity(String severity) {
+        this.severity = severity;
+    }
+
+    public String getConditionsJson() {
+        return conditionsJson;
+    }
+
+    public void setConditionsJson(String conditionsJson) {
+        this.conditionsJson = conditionsJson;
+    }
+
+    public Boolean getActive() {
+        return active;
+    }
+
+    public void setActive(Boolean active) {
+        this.active = active;
+    }
 }
