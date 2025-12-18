@@ -5,11 +5,8 @@ import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
-import io.swagger.v3.oas.models.servers.Server;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import java.util.List;
 
 @Configuration
 public class OpenApiConfig {
@@ -19,13 +16,27 @@ public class OpenApiConfig {
         final String securitySchemeName = "bearerAuth";
         
         return new OpenAPI()
-                .servers(List.of(
-                        new Server().url("https://9082.pro604cr.amypo.ai/"),
-                        new Server().url("http://localhost:9001/")
-                ))
                 .info(new Info()
                         .title("IT Policy Violation Detection API")
-                        .description("API for detecting IT policy violations")
+                        .description("""
+                            ### API Documentation
+                            
+                            This system captures and analyzes user login activity, device usage, and security events 
+                            to detect potential IT policy violations across an organization.
+                            
+                            ### Features:
+                            - User authentication and authorization with JWT
+                            - Login event tracking and analysis
+                            - Device profile management
+                            - Configurable policy rules
+                            - Violation detection and reporting
+                            - Role-based access control (ADMIN, AUDITOR, USER)
+                            
+                            ### Authentication:
+                            - Register at `/auth/register`
+                            - Login at `/auth/login` to get JWT token
+                            - Include token in header: `Authorization: Bearer <token>`
+                            """)
                         .version("1.0.0"))
                 .addSecurityItem(new SecurityRequirement().addList(securitySchemeName))
                 .components(new Components()

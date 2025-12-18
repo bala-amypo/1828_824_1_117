@@ -54,13 +54,28 @@ public class SecurityConfig {
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> 
                 auth.requestMatchers(
-                    "/auth/**",
-                    "/api/logins/record",
-                    "/status",
-                    "/swagger-ui/**",
-                    "/v3/api-docs/**",
-                    "/swagger-resources/**",
-                    "/webjars/**"
+                    // ========== AUTHENTICATION ENDPOINTS ==========
+                    "/auth/**",                    // All auth endpoints
+                    
+                    // ========== PUBLIC API ENDPOINTS ==========
+                    "/api/logins/record",          // Public login recording
+                    
+                    // ========== HEALTH & STATUS ENDPOINTS ==========
+                    "/status",                     // Servlet status
+                    "/health",                     // Health check
+                    "/",                           // Root/home
+                    "/info",                       // API info
+                    
+                    // ========== SWAGGER/OPENAPI DOCUMENTATION ==========
+                    "/swagger-ui/**",              // Swagger UI
+                    "/swagger-ui.html",            // Swagger UI HTML
+                    "/v3/api-docs/**",             // OpenAPI JSON docs
+                    "/api-docs/**",                // API docs
+                    "/swagger-resources/**",       // Swagger resources
+                    "/swagger-resources",          // Swagger resources
+                    "/webjars/**",                 // WebJars
+                    "/favicon.ico",                // Favicon
+                    "/error"                       // Error pages
                 ).permitAll()
                 .anyRequest().authenticated()
             );

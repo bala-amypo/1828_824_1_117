@@ -17,6 +17,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 @Tag(name = "Authentication", description = "Authentication endpoints")
@@ -39,10 +41,65 @@ public class AuthController {
         this.passwordEncoder = passwordEncoder;
     }
     
+    // ==================== HEALTH ENDPOINTS ====================
+    
+    @Operation(summary = "API Health Check", description = "Check if API is running")
+    @GetMapping("/health")
+    public ResponseEntity<Map<String, String>> health() {
+        Map<String, String> response = new HashMap<>();
+        response.put("status", "UP");
+        response.put("message", "IT Policy Violation Detection API is running");
+        response.put("timestamp", String.valueOf(System.currentTimeMillis()));
+        return ResponseEntity.ok(response);
+    }
+    
+    @Operation(summary = "API Home", description = "Welcome endpoint")
+    @GetMapping("/")
+    public ResponseEntity<Map<String, String>> home() {
+        Map<String, String> response = new HashMap<>();
+        response.put("message", "Welcome to IT Policy Violation Detection API");
+        response.put("version", "1.0.0");
+        response.put("documentation", "/swagger-ui/index.html");
+        response.put("health", "/auth/health");
+        response.put("status", "/status");
+        return ResponseEntity.ok(response);
+    }
+    
+    @Operation(summary = "API Info", description = "Get API information")
+    @GetMapping("/info")
+    public ResponseEntity<Map<String, Object>> info() {
+        Map<String, Object> response = new HashMap<>();
+        response.put("name", "IT Policy Violation Detection API");
+        response.put("description", "Captures and analyzes user login activity to detect IT policy violations");
+        response.put("version", "1.0.0");
+        response.put("author", "System Administrator");
+        
+        Map<String, String> endpoints = new HashMap<>();
+        endpoints.put("register", "POST /auth/register");
+        endpoints.put("login", "POST /auth/login");
+        endpoints.put("users", "GET /api/users");
+        endpoints.put("logins", "POST /api/logins/record");
+        endpoints.put("devices", "GET /api/devices");
+        endpoints.put("rules", "GET /api/rules");
+        endpoints.put("violations", "GET /api/violations");
+        
+        response.put("endpoints", endpoints);
+        return ResponseEntity.ok(response);
+    }
+    
+    // ==================== AUTH ENDPOINTS ====================
+    
     @Operation(summary = "Register a new user")
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody RegisterRequest request) {
         try {
+            // Check if username already exists
+            Optional<UserAccount> existingUser = userAccountService.findByUsername(request.getUsername());
+            if (existingUser.isPresent()) {
+                return ResponseEntity.badRequest().body("Username already exists");
+            }
+            
+            // Create new user
             UserAccount user = new UserAccount();
             user.setEmployeeId(request.getEmployeeId());
             user.setUsername(request.getUsername());
@@ -53,12 +110,15 @@ public class AuthController {
             
             UserAccount createdUser = userAccountService.createUser(user);
             
-            return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "User registered successfully");
+            response.put("userId", createdUser.getId());
+            response.put("username", createdUser.getUsername());
             
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
+            
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Registration failed");
+            return ResponseEntity.badRequest().body("Registration failed: " + e.getMessage());
         }
     }
     
@@ -66,9 +126,11 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest request) {
         try {
-            // Find user by username or email
+            // Find user by username
             Optional<UserAccount> userOpt = userAccountService.findByUsername(request.getUsernameOrEmail());
             if (userOpt.isEmpty()) {
+                // Try by email
+                // Note: You need to add findByEmail method to UserAccountService
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
             }
             
