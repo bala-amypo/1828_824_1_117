@@ -35,7 +35,7 @@ public class LoginEvent {
 
     private String failureReason;
 
-    // NEW FIELDS ADDED
+    // Additional fields
     private String deviceId;
     private String location;
     private String deviceInfo;
@@ -82,7 +82,6 @@ public class LoginEvent {
     public String getFailureReason() { return failureReason; }
     public void setFailureReason(String failureReason) { this.failureReason = failureReason; }
 
-    // NEW GETTERS AND SETTERS
     public String getDeviceId() { return deviceId; }
     public void setDeviceId(String deviceId) { this.deviceId = deviceId; }
 
