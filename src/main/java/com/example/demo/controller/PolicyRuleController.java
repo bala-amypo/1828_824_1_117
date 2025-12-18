@@ -11,63 +11,47 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@Tag(name = "Policy Rules", description = "Endpoints for managing violation detection rules")
+@Tag(name = "Policy Rules", description = "Policy rule management")
 @RestController
 @RequestMapping("/api/rules")
 public class PolicyRuleController {
-
+    
     private final PolicyRuleService policyRuleService;
-
+    
     public PolicyRuleController(PolicyRuleService policyRuleService) {
         this.policyRuleService = policyRuleService;
     }
-
-    @Operation(summary = "Create a new policy rule")
+    
+    @Operation(summary = "Create new rule")
     @PostMapping("/")
-    @PreAuthorize("hasAnyAuthority('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<PolicyRule> createRule(@RequestBody PolicyRule rule) {
         PolicyRule createdRule = policyRuleService.createRule(rule);
-        return new ResponseEntity<>(createdRule, HttpStatus.CREATED);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdRule);
     }
-
-    @Operation(summary = "Update an existing policy rule")
+    
+    @Operation(summary = "Update rule")
     @PutMapping("/{id}")
-    @PreAuthorize("hasAnyAuthority('ADMIN')")
-    public ResponseEntity<PolicyRule> updateRule(@PathVariable Long id, @RequestBody PolicyRule rule) {
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity<PolicyRule> updateRule(@PathVariable Long id, 
+                                                @RequestBody PolicyRule rule) {
         PolicyRule updatedRule = policyRuleService.updateRule(id, rule);
         return ResponseEntity.ok(updatedRule);
     }
-
-    @Operation(summary = "Get a policy rule by ID")
-    @GetMapping("/{id}")
-    @PreAuthorize("hasAnyAuthority('ADMIN', 'AUDITOR')")
-    public ResponseEntity<PolicyRule> getRuleById(@PathVariable Long id) {
-        return policyRuleService.getRuleById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
-    }
-
-    @Operation(summary = "Get all active policy rules")
+    
+    @Operation(summary = "List active rules")
     @GetMapping("/active")
     @PreAuthorize("hasAnyAuthority('ADMIN', 'AUDITOR')")
     public ResponseEntity<List<PolicyRule>> getActiveRules() {
         List<PolicyRule> activeRules = policyRuleService.getActiveRules();
         return ResponseEntity.ok(activeRules);
     }
-
-    @Operation(summary = "Get all policy rules")
+    
+    @Operation(summary = "List all rules")
     @GetMapping("/")
     @PreAuthorize("hasAnyAuthority('ADMIN', 'AUDITOR')")
     public ResponseEntity<List<PolicyRule>> getAllRules() {
         List<PolicyRule> allRules = policyRuleService.getAllRules();
         return ResponseEntity.ok(allRules);
-    }
-
-    @Operation(summary = "Delete a policy rule")
-    @DeleteMapping("/{id}")
-    @PreAuthorize("hasAnyAuthority('ADMIN')")
-    public ResponseEntity<Void> deleteRule(@PathVariable Long id) {
-        policyRuleService.deleteRule(id);
-        return ResponseEntity.noContent().build();
     }
 }
