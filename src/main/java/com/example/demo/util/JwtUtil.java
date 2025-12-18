@@ -3,10 +3,9 @@ package com.example.demo.security;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import java.security.Key;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -15,25 +14,35 @@ import java.util.function.Function;
 @Component
 public class JwtUtil {
     
-    private final String secret;
-    private final long validityInMs;
-    private final boolean isTestMode;
+    @Value("${jwt.secret}")
+    private String secret;
     
-    public JwtUtil(String secret, long validityInMs, boolean isTestMode) {
+    @Value("${jwt.validity}")
+    private long validityInMs;
+    
+    @Value("${jwt.test-mode}")
+    private boolean isTestMode;
+    
+    // Constructor as required by the question
+    public JwtUtil(@Value("${jwt.secret}") String secret, 
+                   @Value("${jwt.validity}") long validityInMs, 
+                   @Value("${jwt.test-mode}") boolean isTestMode) {
         this.secret = secret;
         this.validityInMs = validityInMs;
         this.isTestMode = isTestMode;
     }
     
+    // Default constructor for Spring
     public JwtUtil() {
-        // Default constructor for Spring
-        this.secret = "mySuperSecretKeyForJWTAuthenticationInPolicyViolationSystem123";
-        this.validityInMs = 86400000;
-        this.isTestMode = false;
+        // Spring will inject values via @Value
     }
     
-    private Key getSigningKey() {
-        return Keys.hmacShaKeyFor(secret.getBytes());
+    // For test mode, use a simpler key
+    private String getSigningKey() {
+        if (isTestMode) {
+            return "test-secret-key-for-jwt-in-test-mode-1234567890";
+        }
+        return secret;
     }
     
     public String extractUsername(String token) {
@@ -50,9 +59,8 @@ public class JwtUtil {
     }
     
     private Claims extractAllClaims(String token) {
-        return Jwts.parserBuilder()
+        return Jwts.parser()
                 .setSigningKey(getSigningKey())
-                .build()
                 .parseClaimsJws(token)
                 .getBody();
     }
@@ -72,7 +80,7 @@ public class JwtUtil {
                 .setSubject(subject)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + validityInMs))
-                .signWith(getSigningKey(), SignatureAlgorithm.HS256)
+                .signWith(SignatureAlgorithm.HS512, getSigningKey())
                 .compact();
     }
     
@@ -83,10 +91,7 @@ public class JwtUtil {
     
     public Boolean validateToken(String token) {
         try {
-            Jwts.parserBuilder()
-                .setSigningKey(getSigningKey())
-                .build()
-                .parseClaimsJws(token);
+            Jwts.parser().setSigningKey(getSigningKey()).parseClaimsJws(token);
             return true;
         } catch (Exception e) {
             return false;

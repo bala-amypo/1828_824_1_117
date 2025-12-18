@@ -21,26 +21,21 @@ public class OpenApiConfig {
         final String securitySchemeName = "bearerAuth";
         
         return new OpenAPI()
-                // Servers configuration
                 .servers(List.of(
                         new Server()
                                 .url("https://9082.pro604cr.amypo.ai/")
                                 .description("Production Server"),
                         new Server()
-                                .url("http://localhost:8080/")
-                                .description("Local Development Server")
+                                .url("http://localhost:9001/")
+                                .description("Local Development Server (Port 9001)")
                 ))
-                
-                // API Information
                 .info(new Info()
                         .title("IT Policy Violation Detection API")
                         .description("""
-                            ### API Documentation
+                            API for detecting IT policy violations. This system captures and analyzes user login activity, 
+                            device usage, and security events to detect potential IT policy violations across an organization.
                             
-                            This system captures and analyzes user login activity, device usage, and security events 
-                            to detect potential IT policy violations across an organization.
-                            
-                            ### Features:
+                            ### Key Features:
                             - User authentication and authorization with JWT
                             - Login event tracking and analysis
                             - Device profile management
@@ -49,19 +44,17 @@ public class OpenApiConfig {
                             - Role-based access control (ADMIN, AUDITOR, USER)
                             
                             ### Authentication:
-                            - Register at `/auth/register`
-                            - Login at `/auth/login` to get JWT token
-                            - Include token in header: `Authorization: Bearer <token>`
+                            1. Register at `POST /auth/register`
+                            2. Login at `POST /auth/login` to get JWT token
+                            3. Include token in header: `Authorization: Bearer <token>`
                             """)
                         .version("1.0.0")
                         .contact(new Contact()
                                 .name("API Support")
                                 .email("support@example.com"))
                         .license(new License()
-                                .name("Apache 2.0")
-                                .url("http://springdoc.org")))
-                
-                // Security Scheme
+                                .name("MIT")
+                                .url("https://opensource.org/licenses/MIT")))
                 .addSecurityItem(new SecurityRequirement().addList(securitySchemeName))
                 .components(new Components()
                         .addSecuritySchemes(securitySchemeName,
@@ -69,7 +62,6 @@ public class OpenApiConfig {
                                         .name(securitySchemeName)
                                         .type(SecurityScheme.Type.HTTP)
                                         .scheme("bearer")
-                                        .bearerFormat("JWT")
-                                        .description("JWT Authorization header using the Bearer scheme. Example: `Authorization: Bearer {token}`")));
+                                        .bearerFormat("JWT")));
     }
 }
