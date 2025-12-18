@@ -1,8 +1,6 @@
 package com.example.demo.security;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
@@ -18,13 +16,8 @@ public class JwtUtil {
     @Value("${jwt.secret}")
     private String secret;
 
-    @Value("${jwt.validity}")
+    @Value("${jwt.validity}")  // Changed from expiration to validity (matches your properties)
     private Long jwtValidity;
-
-    public String generateToken(Authentication authentication) {
-        Map<String, Object> claims = new HashMap<>();
-        return createToken(claims, authentication.getName());
-    }
 
     public String generateToken(String username) {
         Map<String, Object> claims = new HashMap<>();
