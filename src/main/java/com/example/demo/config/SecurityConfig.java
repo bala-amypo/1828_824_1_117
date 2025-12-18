@@ -54,17 +54,19 @@ public class SecurityConfig {
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> 
                 auth.requestMatchers(
-                    // ========== AUTHENTICATION ENDPOINTS ==========
-                    "/auth/**",                    // All auth endpoints
+                    // ========== AUTHENTICATION & HEALTH ENDPOINTS ==========
+                    "/auth/**",                    // All auth endpoints including /health, /, /info
                     
                     // ========== PUBLIC API ENDPOINTS ==========
                     "/api/logins/record",          // Public login recording
                     
-                    // ========== HEALTH & STATUS ENDPOINTS ==========
+                    // ========== SERVLET STATUS ==========
                     "/status",                     // Servlet status
-                    "/health",                     // Health check
-                    "/",                           // Root/home
-                    "/info",                       // API info
+                    
+                    // ========== ROOT ENDPOINTS ==========
+                    "/",                           // Root (if you have a separate controller)
+                    "/health",                     // Alternative health endpoint
+                    "/info",                       // Alternative info endpoint
                     
                     // ========== SWAGGER/OPENAPI DOCUMENTATION ==========
                     "/swagger-ui/**",              // Swagger UI
