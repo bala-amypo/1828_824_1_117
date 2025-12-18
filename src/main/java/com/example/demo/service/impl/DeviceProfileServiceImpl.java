@@ -4,34 +4,44 @@ import com.example.demo.entity.DeviceProfile;
 import com.example.demo.repository.DeviceProfileRepository;
 import com.example.demo.service.DeviceProfileService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Service
+@Transactional
 public class DeviceProfileServiceImpl implements DeviceProfileService {
-
-    private final DeviceProfileRepository repository;
-
-    public DeviceProfileServiceImpl(DeviceProfileRepository repository) {
-        this.repository = repository;
+    
+    private final DeviceProfileRepository deviceProfileRepository;
+    
+    public DeviceProfileServiceImpl(DeviceProfileRepository deviceProfileRepository) {
+        this.deviceProfileRepository = deviceProfileRepository;
     }
-
+    
     @Override
     public DeviceProfile registerDevice(DeviceProfile device) {
-        return repository.save(device);
+        device.setLastSeen(LocalDateTime.now());
+        return deviceProfileRepository.save(device);
     }
-
+    
+    @Override
+    public DeviceProfile updateTrustStatus(Long id, boolean trust) {
+        DeviceProfile device = deviceProfileRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Device not found"));
+        device.setIsTrusted(trust);
+        device.setLastSeen(LocalDateTime.now());
+        return deviceProfileRepository.save(device);
+    }
+    
     @Override
     public List<DeviceProfile> getDevicesByUser(Long userId) {
-        // Ensure your repository has a findByUserId method if needed, 
-        // or filter accordingly.
-        return repository.findAll().stream()
-                .filter(d -> d.getId().equals(userId)) // Example logic
-                .toList();
+        return deviceProfileRepository.findByUserId(userId);
     }
-
+    
     @Override
-    public DeviceProfile findByDeviceId(String deviceId) {
-        // Matches the Controller's call
-        return repository.findByDeviceid(deviceId);
+    public Optional<DeviceProfile> findByDeviceId(String deviceId) {
+        return deviceProfileRepository.findByDeviceId(deviceId);
     }
 }

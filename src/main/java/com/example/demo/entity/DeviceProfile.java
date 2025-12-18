@@ -1,68 +1,37 @@
 package com.example.demo.entity;
 
 import jakarta.persistence.*;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
+import java.time.LocalDateTime;
 
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
-@Table(name = "device_profiles")
+@Table(name = "device_profiles", uniqueConstraints = {
+    @UniqueConstraint(columnNames = {"userId", "deviceId"})
+})
 public class DeviceProfile {
-
+    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    private String deviceid;
-    private String deviceName;
+    
+    @Column(nullable = false)
+    private Long userId;
+    
+    @Column(nullable = false)
+    private String deviceId;
+    
     private String deviceType;
-    private boolean trusted;
-
-    public DeviceProfile() {
-    }
-
-    public DeviceProfile(Long id, String deviceid, String deviceName, String deviceType, boolean trusted) {
-        this.id = id;
-        this.deviceid = deviceid;
-        this.deviceName = deviceName;
-        this.deviceType = deviceType;
-        this.trusted = trusted;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getDeviceid() {
-        return deviceid;
-    }
-
-    public void setDeviceid(String deviceid) {
-        this.deviceid = deviceid;
-    }
-
-    public String getDeviceName() {
-        return deviceName;
-    }
-
-    public void setDeviceName(String deviceName) {
-        this.deviceName = deviceName;
-    }
-
-    public String getDeviceType() {
-        return deviceType;
-    }
-
-    public void setDeviceType(String deviceType) {
-        this.deviceType = deviceType;
-    }
-
-    public boolean isTrusted() {
-        return trusted;
-    }
-
-    public void setTrusted(boolean trusted) {
-        this.trusted = trusted;
-    }
+    
+    private String osVersion;
+    
+    @Column(nullable = false)
+    private LocalDateTime lastSeen = LocalDateTime.now();
+    
+    @Column(nullable = false)
+    private Boolean isTrusted = false;
 }

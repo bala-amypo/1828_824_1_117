@@ -7,8 +7,7 @@ import java.util.Optional;
 public interface PolicyRuleService {
     PolicyRule createRule(PolicyRule rule);
     PolicyRule updateRule(Long id, PolicyRule rule);
-    Optional<PolicyRule> getRuleById(Long id);
-    List<PolicyRule> getAllRules();
     List<PolicyRule> getActiveRules();
-    void deleteRule(Long id);
+    Optional<PolicyRule> getRuleByCode(String ruleCode);
+    List<PolicyRule> getAllRules();
 }
