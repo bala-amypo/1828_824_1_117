@@ -4,7 +4,12 @@ import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "login_events")
+@Table(name = "login_events", indexes = {
+    @Index(name = "idx_user_id", columnList = "userId"),
+    @Index(name = "idx_event_time", columnList = "eventTime"),
+    @Index(name = "idx_status", columnList = "status"),
+    @Index(name = "idx_ip_address", columnList = "ipAddress")
+})
 public class LoginEvent {
 
     @Id
@@ -17,6 +22,7 @@ public class LoginEvent {
     @Column(nullable = false)
     private String username;
 
+    @Column(nullable = false)
     private String ipAddress;
 
     private String userAgent;
@@ -24,15 +30,18 @@ public class LoginEvent {
     @Column(nullable = false)
     private LocalDateTime eventTime;
 
-    private String status; // SUCCESS, FAILED, SUSPICIOUS, etc.
+    @Column(nullable = false)
+    private String status; // SUCCESS, FAILED, LOCKED, etc.
 
+    private String failureReason;
+
+    // NEW FIELDS ADDED
+    private String deviceId;
     private String location;
-
     private String deviceInfo;
-
     private Boolean suspicious = false;
-
     private String suspicionReason;
+    private String loginStatus; // ACTIVE, INACTIVE, LOCKED
 
     // Constructors
     public LoginEvent() {
@@ -70,6 +79,13 @@ public class LoginEvent {
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
 
+    public String getFailureReason() { return failureReason; }
+    public void setFailureReason(String failureReason) { this.failureReason = failureReason; }
+
+    // NEW GETTERS AND SETTERS
+    public String getDeviceId() { return deviceId; }
+    public void setDeviceId(String deviceId) { this.deviceId = deviceId; }
+
     public String getLocation() { return location; }
     public void setLocation(String location) { this.location = location; }
 
@@ -81,4 +97,7 @@ public class LoginEvent {
 
     public String getSuspicionReason() { return suspicionReason; }
     public void setSuspicionReason(String suspicionReason) { this.suspicionReason = suspicionReason; }
+
+    public String getLoginStatus() { return loginStatus; }
+    public void setLoginStatus(String loginStatus) { this.loginStatus = loginStatus; }
 }
