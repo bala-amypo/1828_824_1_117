@@ -58,8 +58,11 @@ public class SecurityConfig {
             .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> 
-                auth.requestMatchers("/api/auth/**").permitAll()
-                    .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                auth.requestMatchers("/auth/**").permitAll()  // ✅ FIX: Added /auth/**
+                    .requestMatchers("/api/auth/**").permitAll()
+                    .requestMatchers("/api/logins/record").permitAll()  // ✅ Allow login recording
+                    .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html").permitAll()
+                    .requestMatchers("/actuator/health").permitAll()  // ✅ Health check
                     .anyRequest().authenticated()
             );
 
