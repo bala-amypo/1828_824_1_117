@@ -16,6 +16,7 @@ import java.util.List;
 public class LoginEventController {
 
     private final LoginEventService loginEventService;
+    
 
    
     public LoginEventController(LoginEventService loginEventService) {
