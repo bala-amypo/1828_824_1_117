@@ -4,6 +4,7 @@ import com.example.demo.entity.LoginEvent;
 import java.util.List;
 
 public interface LoginEventService {
-    LoginEvent logEvent(LoginEvent event);
-    List<LoginEvent> getAllEvents();
+    LoginEvent recordLogin(LoginEvent event);
+    List<LoginEvent> getEventsByUser(Long userId);
+    List<LoginEvent> getSuspiciousLogins(Long userId);
 }
