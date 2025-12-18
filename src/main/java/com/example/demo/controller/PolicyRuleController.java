@@ -17,12 +17,12 @@ public class PolicyRuleController {
 
     private final PolicyRuleService policyRuleService;
 
-    // CONSTRUCTOR INJECTION
+    
     public PolicyRuleController(PolicyRuleService policyRuleService) {
         this.policyRuleService = policyRuleService;
     }
 
-    // POST /api/rules/ - Create new rule (Role: ADMIN)
+    
     @PostMapping("/")
     @PreAuthorize("hasAnyAuthority('ADMIN')")
     public ResponseEntity<PolicyRule> createRule(@RequestBody PolicyRule rule) {
@@ -30,7 +30,7 @@ public class PolicyRuleController {
         return new ResponseEntity<>(createdRule, HttpStatus.CREATED);
     }
 
-    // PUT /api/rules/{id} - Update rule (Role: ADMIN)
+    
     @PutMapping("/{id}")
     @PreAuthorize("hasAnyAuthority('ADMIN')")
     public ResponseEntity<PolicyRule> updateRule(@PathVariable Long id, @RequestBody PolicyRule rule) {
@@ -38,7 +38,7 @@ public class PolicyRuleController {
         return ResponseEntity.ok(updatedRule);
     }
     
-    // GET /api/rules/active - List active rules
+    
     @GetMapping("/active")
     @PreAuthorize("hasAnyAuthority('ADMIN', 'AUDITOR')")
     public ResponseEntity<List<PolicyRule>> getActiveRules() {
@@ -46,7 +46,7 @@ public class PolicyRuleController {
         return ResponseEntity.ok(activeRules);
     }
 
-    // GET /api/rules/ - List all rules
+    
     @GetMapping("/")
     @PreAuthorize("hasAnyAuthority('ADMIN', 'AUDITOR')")
     public ResponseEntity<List<PolicyRule>> getAllRules() {

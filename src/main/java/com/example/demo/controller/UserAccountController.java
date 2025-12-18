@@ -16,14 +16,12 @@ public class UserAccountController {
 
     private final UserAccountService userAccountService;
 
-    // CONSTRUCTOR INJECTION
+    
     public UserAccountController(UserAccountService userAccountService) {
         this.userAccountService = userAccountService;
     }
 
-    // POST /api/users - Create new user (Role: ADMIN)
-    // Note: Registration is handled in AuthController for general users, 
-    // this endpoint can be reserved for admin-created accounts or specific DTOs.
+    
     @PostMapping("/")
     @PreAuthorize("hasAnyAuthority('ADMIN')")
     public ResponseEntity<UserAccount> createNewUser(@RequestBody UserAccount user) {
@@ -31,7 +29,7 @@ public class UserAccountController {
         return ResponseEntity.ok(createdUser);
     }
 
-    // GET /api/users/{id} - Get user by ID (Role: ADMIN, or self)
+   
     @GetMapping("/{id}")
     @PreAuthorize("hasAnyAuthority('ADMIN', 'AUDITOR')")
     public ResponseEntity<UserAccount> getUserById(@PathVariable Long id) {
@@ -39,7 +37,7 @@ public class UserAccountController {
         return ResponseEntity.ok(user);
     }
 
-    // PUT /api/users/{id}/status - Update account status (Role: ADMIN)
+    
     @PutMapping("/{id}/status")
     @PreAuthorize("hasAnyAuthority('ADMIN')")
     public ResponseEntity<UserAccount> updateAccountStatus(@PathVariable Long id, @RequestParam String status) {
@@ -47,7 +45,6 @@ public class UserAccountController {
         return ResponseEntity.ok(updatedUser);
     }
 
-    // GET /api/users - List all users (Role: ADMIN, AUDITOR)
     @GetMapping("/")
     @PreAuthorize("hasAnyAuthority('ADMIN', 'AUDITOR')")
     public ResponseEntity<List<UserAccount>> getAllUsers() {

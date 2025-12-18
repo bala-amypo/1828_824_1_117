@@ -17,19 +17,19 @@ public class LoginEventController {
 
     private final LoginEventService loginEventService;
 
-    // CONSTRUCTOR INJECTION
+   
     public LoginEventController(LoginEventService loginEventService) {
         this.loginEventService = loginEventService;
     }
 
-    // POST /api/logins/record - Log a login attempt (Usually internal or system call)
+   
     @PostMapping("/record")
     public ResponseEntity<LoginEvent> recordLogin(@RequestBody LoginEvent event) {
         LoginEvent loggedEvent = loginEventService.recordLogin(event);
         return new ResponseEntity<>(loggedEvent, HttpStatus.CREATED);
     }
 
-    // GET /api/logins/{userId} - Get login events for a specific user
+   
     @GetMapping("/{userId}")
     @PreAuthorize("hasAnyAuthority('ADMIN', 'AUDITOR') or @securityService.isUserSelf(#userId)")
     public ResponseEntity<List<LoginEvent>> getEventsForUser(@PathVariable Long userId) {
@@ -37,7 +37,6 @@ public class LoginEventController {
         return ResponseEntity.ok(events);
     }
 
-    // GET /api/logins/suspicious/{userId} - Get suspicious login activity for user
     @GetMapping("/suspicious/{userId}")
     @PreAuthorize("hasAnyAuthority('ADMIN', 'AUDITOR')")
     public ResponseEntity<List<LoginEvent>> getSuspiciousLogins(@PathVariable Long userId) {
@@ -45,7 +44,7 @@ public class LoginEventController {
         return ResponseEntity.ok(suspiciousEvents);
     }
     
-    // GET /api/logins/ - List all login events
+   
     @GetMapping("/")
     @PreAuthorize("hasAnyAuthority('ADMIN', 'AUDITOR')")
     public ResponseEntity<List<LoginEvent>> getAllLoginEvents() {

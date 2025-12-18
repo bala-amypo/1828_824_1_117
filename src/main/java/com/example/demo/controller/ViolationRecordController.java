@@ -17,19 +17,18 @@ public class ViolationRecordController {
 
     private final ViolationRecordService violationRecordService;
 
-    // CONSTRUCTOR INJECTION
+    
     public ViolationRecordController(ViolationRecordService violationRecordService) {
         this.violationRecordService = violationRecordService;
     }
 
-    // POST /api/violations/ - Log violation (Internal system call)
+    
     @PostMapping("/")
     public ResponseEntity<ViolationRecord> logViolation(@RequestBody ViolationRecord violation) {
         ViolationRecord loggedViolation = violationRecordService.logViolation(violation);
         return new ResponseEntity<>(loggedViolation, HttpStatus.CREATED);
     }
 
-    // GET /api/violations/user/{userId} - Get violations by user
     @GetMapping("/user/{userId}")
     @PreAuthorize("hasAnyAuthority('ADMIN', 'AUDITOR')")
     public ResponseEntity<List<ViolationRecord>> getViolationsByUser(@PathVariable Long userId) {
@@ -37,7 +36,7 @@ public class ViolationRecordController {
         return ResponseEntity.ok(violations);
     }
 
-    // PUT /api/violations/{id}/resolve - Mark violation as resolved (Role: ADMIN)
+    
     @PutMapping("/{id}/resolve")
     @PreAuthorize("hasAnyAuthority('ADMIN')")
     public ResponseEntity<ViolationRecord> markResolved(@PathVariable Long id) {
