@@ -44,7 +44,6 @@ public class ViolationRecordController {
         return ResponseEntity.ok(resolvedViolation);
     }
 
-    // GET /api/violations/unresolved - List unresolved violations
     @GetMapping("/unresolved")
     @PreAuthorize("hasAnyAuthority('ADMIN', 'AUDITOR')")
     public ResponseEntity<List<ViolationRecord>> getUnresolvedViolations() {
@@ -52,7 +51,7 @@ public class ViolationRecordController {
         return ResponseEntity.ok(unresolved);
     }
 
-    // GET /api/violations/ - List all violations
+   
     @GetMapping("/")
     @PreAuthorize("hasAnyAuthority('ADMIN', 'AUDITOR')")
     public ResponseEntity<List<ViolationRecord>> getAllViolations() {

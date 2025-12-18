@@ -11,9 +11,9 @@ public class ViolationRecord {
     private Long id;
 
     private Long userId;
-    private Long policyRuleId;   // Fixes setPolicyRuleId error
-    private Long eventId;        // Fixes setEventId error
-    private String violationType; // Fixes setViolationType error
+    private Long policyRuleId;   
+    private Long eventId;        
+    private String violationType; 
     private String severity;
     private String ruleCode;
     
@@ -25,7 +25,6 @@ public class ViolationRecord {
 
     public ViolationRecord() {}
 
-    // Add these specific Getters/Setters to fix RuleEvaluationUtil errors
     public Long getPolicyRuleId() { return policyRuleId; }
     public void setPolicyRuleId(Long policyRuleId) { this.policyRuleId = policyRuleId; }
 
@@ -35,7 +34,6 @@ public class ViolationRecord {
     public String getViolationType() { return violationType; }
     public void setViolationType(String violationType) { this.violationType = violationType; }
 
-    // Standard Getters/Setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
     public Long getUserId() { return userId; }

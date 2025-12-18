@@ -16,18 +16,18 @@ public class PolicyRule {
     private String description;
 
     @Column(nullable = false)
-    private String severity; // LOW, MEDIUM, HIGH, CRITICAL
+    private String severity; 
 
     @Column(columnDefinition = "TEXT")
     private String conditionsJson;
 
     private Boolean active = true;
 
-    // 1. Default No-Args Constructor
+
     public PolicyRule() {
     }
 
-    // 2. Parameterized Constructor
+
     public PolicyRule(String ruleCode, String description, String severity, String conditionsJson, Boolean active) {
         this.ruleCode = ruleCode;
         this.description = description;
@@ -36,7 +36,6 @@ public class PolicyRule {
         this.active = active != null ? active : true;
     }
 
-    // 3. Getters and Setters
     public Long getId() {
         return id;
     }

@@ -25,13 +25,11 @@ public class LoginEvent {
     private LocalDateTime timestamp = LocalDateTime.now();
 
     @Column(nullable = false)
-    private String loginStatus; // SUCCESS, FAILED
+    private String loginStatus; 
 
-    // 1. Default No-Args Constructor (Required for JPA)
     public LoginEvent() {
     }
 
-    // 2. Full Parameterized Constructor
     public LoginEvent(Long userId, String ipAddress, String location, String deviceId, String loginStatus) {
         this.userId = userId;
         this.ipAddress = ipAddress;
@@ -41,7 +39,6 @@ public class LoginEvent {
         this.timestamp = LocalDateTime.now();
     }
 
-    // 3. Getters and Setters
     public Long getId() {
         return id;
     }

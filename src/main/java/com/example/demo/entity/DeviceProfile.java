@@ -15,11 +15,9 @@ public class DeviceProfile {
     private String deviceType;
     private boolean trusted;
 
-    // 1. Default No-Args Constructor (Required by JPA/Hibernate)
     public DeviceProfile() {
     }
 
-    // 2. Full Parameterized Constructor
     public DeviceProfile(Long id, String deviceid, String deviceName, String deviceType, boolean trusted) {
         this.id = id;
         this.deviceid = deviceid;
@@ -28,7 +26,6 @@ public class DeviceProfile {
         this.trusted = trusted;
     }
 
-    // 3. Getters and Setters
     public Long getId() {
         return id;
     }

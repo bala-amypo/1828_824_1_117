@@ -6,6 +6,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface DeviceProfileRepository extends JpaRepository<DeviceProfile, Long> {
-    // Note: 'deviceid' must match the field name in your DeviceProfile entity exactly
+    
     DeviceProfile findByDeviceid(String deviceid);
 }
