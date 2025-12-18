@@ -1,76 +1,79 @@
 package com.example.demo.controller;
 
-import com.example.demo.dto.JwtResponse;
-import com.example.demo.dto.LoginRequest;
-import com.example.demo.dto.RegisterRequest;
+import com.example.demo.dto.AuthRequest;
+import com.example.demo.dto.AuthResponse;
 import com.example.demo.entity.UserAccount;
-import com.example.demo.service.UserAccountService;
-import com.example.demo.util.JwtUtil;
+import com.example.demo.repository.UserAccountRepository;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
-@Tag(name = "Authentication", description = "User registration and login endpoints")
+import java.util.Optional;
+
+@Tag(name = "Authentication", description = "User authentication and registration endpoints")
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
 
-    private final UserAccountService userAccountService;
-    private final AuthenticationManager authenticationManager;
-    private final JwtUtil jwtUtil;
+    private final UserAccountRepository userAccountRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    
-    public AuthController(
-            UserAccountService userAccountService, 
-            AuthenticationManager authenticationManager, 
-            JwtUtil jwtUtil) {
-        this.userAccountService = userAccountService;
-        this.authenticationManager = authenticationManager;
-        this.jwtUtil = jwtUtil;
+    public AuthController(UserAccountRepository userAccountRepository, 
+                         PasswordEncoder passwordEncoder) {
+        this.userAccountRepository = userAccountRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
-    
+    @Operation(summary = "Register a new user")
     @PostMapping("/register")
-    public ResponseEntity<String> registerUser(@RequestBody RegisterRequest registerRequest) {
+    public ResponseEntity<UserAccount> register(@RequestBody AuthRequest request) {
+        // Check if username already exists
+        if (userAccountRepository.findByUsername(request.getUsername()).isPresent()) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        }
         
-        UserAccount newUser = new UserAccount();
-        newUser.setUsername(registerRequest.getUsername());
-        newUser.setPassword(registerRequest.getPassword()); 
-        newUser.setEmail(registerRequest.getEmail());
-        newUser.setEmployeeId(registerRequest.getEmployeeId());
+        // Check if email already exists
+        if (userAccountRepository.findByEmail(request.getEmail()).isPresent()) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+        }
         
-        newUser.setRole(registerRequest.getRole() != null ? registerRequest.getRole() : "USER");
+        UserAccount user = new UserAccount();
+        user.setUsername(request.getUsername());
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
+        user.setEmail(request.getEmail());
+        user.setEmployeeId(request.getEmployeeId());
+        user.setRole(request.getRole() != null ? request.getRole() : "BASE");
         
-        
-        userAccountService.createUser(newUser);
-
-        return new ResponseEntity<>("User registered successfully!", HttpStatus.CREATED);
+        UserAccount savedUser = userAccountRepository.save(user);
+        return ResponseEntity.status(HttpStatus.CREATED).body(savedUser);
     }
 
-    
+    @Operation(summary = "Authenticate user")
     @PostMapping("/login")
-    public ResponseEntity<JwtResponse> authenticateUser(@RequestBody LoginRequest loginRequest) {
+    public ResponseEntity<AuthResponse> login(@RequestBody AuthRequest request) {
+        Optional<UserAccount> userOptional = userAccountRepository.findByUsername(request.getUsername());
         
+        if (userOptional.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
         
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        loginRequest.getUsername(),
-                        loginRequest.getPassword()
-                )
-        );
-
-       
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-
-       
-        String jwt = jwtUtil.generateToken(authentication);
-
+        UserAccount user = userOptional.get();
         
-        return ResponseEntity.ok(new JwtResponse(jwt));
+        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        
+        AuthResponse response = new AuthResponse();
+        response.setId(user.getId());
+        response.setUsername(user.getUsername());
+        response.setEmail(user.getEmail());
+        response.setRole(user.getRole());
+        response.setEmployeeId(user.getEmployeeId());
+        response.setMessage("Login successful");
+        
+        return ResponseEntity.ok(response);
     }
 }
