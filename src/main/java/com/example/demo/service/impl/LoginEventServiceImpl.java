@@ -39,19 +39,33 @@ public class LoginEventServiceImpl implements LoginEventService {
 
     @Override
     public List<LoginEvent> getEventsByUser(String userId) {
-        return loginEventRepository.findByUserIdString(userId);
+        try {
+            // Try to parse as Long first
+            Long userIdLong = Long.parseLong(userId);
+            return loginEventRepository.findByUserId(userIdLong);
+        } catch (NumberFormatException e) {
+            // If not a number, treat as username
+            return loginEventRepository.findByUsername(userId);
+        }
     }
 
     @Override
     public List<LoginEvent> getSuspiciousLogins(Long userId) {
         LocalDateTime lastHour = LocalDateTime.now().minusHours(1);
-        return loginEventRepository.findSuspiciousLogins(userId, lastHour);
+        return loginEventRepository.findSuspiciousLoginsByUserId(userId, lastHour);
     }
 
     @Override
     public List<LoginEvent> getSuspiciousLogins(String userId) {
         LocalDateTime lastHour = LocalDateTime.now().minusHours(1);
-        return loginEventRepository.findSuspiciousLogins(userId, lastHour);
+        try {
+            // Try to parse as Long first
+            Long userIdLong = Long.parseLong(userId);
+            return loginEventRepository.findSuspiciousLoginsByUserId(userIdLong, lastHour);
+        } catch (NumberFormatException e) {
+            // If not a number, treat as username
+            return loginEventRepository.findSuspiciousLoginsByUsername(userId, lastHour);
+        }
     }
 
     @Override
@@ -64,5 +78,16 @@ public class LoginEventServiceImpl implements LoginEventService {
     @Transactional
     public void deleteEvent(Long id) {
         loginEventRepository.deleteById(id);
+    }
+    
+    // Additional helper methods
+    public List<LoginEvent> getRecentEvents(Long userId, int hours) {
+        LocalDateTime sinceTime = LocalDateTime.now().minusHours(hours);
+        return loginEventRepository.findRecentEventsByUserId(userId, sinceTime);
+    }
+    
+    public Long countFailedAttempts(Long userId, int minutes) {
+        LocalDateTime sinceTime = LocalDateTime.now().minusMinutes(minutes);
+        return loginEventRepository.countFailedAttemptsByUserId(userId, sinceTime);
     }
 }

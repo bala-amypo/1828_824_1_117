@@ -37,35 +37,19 @@ public class LoginEventController {
         return ResponseEntity.ok(allEvents);
     }
 
-    @Operation(summary = "Get login events for a specific user by user ID")
+    @Operation(summary = "Get login events for a specific user")
     @GetMapping("/user/{userId}")
-    @PreAuthorize("hasAnyAuthority('ADMIN', 'AUDITOR')")
-    public ResponseEntity<List<LoginEvent>> getEventsForUserById(@PathVariable Long userId) {
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'AUDITOR') or @securityService.isUserSelf(#userId)")
+    public ResponseEntity<List<LoginEvent>> getEventsForUser(@PathVariable String userId) {
         List<LoginEvent> events = loginEventService.getEventsByUser(userId);
         return ResponseEntity.ok(events);
     }
 
-    @Operation(summary = "Get login events for a specific user by username")
-    @GetMapping("/username/{username}")
-    @PreAuthorize("hasAnyAuthority('ADMIN', 'AUDITOR') or @securityService.isUserSelf(#username)")
-    public ResponseEntity<List<LoginEvent>> getEventsForUser(@PathVariable String username) {
-        List<LoginEvent> events = loginEventService.getEventsByUser(username);
-        return ResponseEntity.ok(events);
-    }
-
-    @Operation(summary = "Get suspicious login events for a user by user ID")
-    @GetMapping("/suspicious/id/{userId}")
+    @Operation(summary = "Get suspicious login events for a user")
+    @GetMapping("/suspicious/{userId}")
     @PreAuthorize("hasAnyAuthority('ADMIN', 'AUDITOR')")
-    public ResponseEntity<List<LoginEvent>> getSuspiciousLoginsById(@PathVariable Long userId) {
+    public ResponseEntity<List<LoginEvent>> getSuspiciousLogins(@PathVariable String userId) {
         List<LoginEvent> suspiciousEvents = loginEventService.getSuspiciousLogins(userId);
-        return ResponseEntity.ok(suspiciousEvents);
-    }
-
-    @Operation(summary = "Get suspicious login events for a user by username")
-    @GetMapping("/suspicious/username/{username}")
-    @PreAuthorize("hasAnyAuthority('ADMIN', 'AUDITOR')")
-    public ResponseEntity<List<LoginEvent>> getSuspiciousLogins(@PathVariable String username) {
-        List<LoginEvent> suspiciousEvents = loginEventService.getSuspiciousLogins(username);
         return ResponseEntity.ok(suspiciousEvents);
     }
 
