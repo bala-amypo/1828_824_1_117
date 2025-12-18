@@ -10,9 +10,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "device_profiles", uniqueConstraints = {
-    @UniqueConstraint(columnNames = {"userId", "deviceId"})
-})
+@Table(name = "device_profiles")
 public class DeviceProfile {
     
     @Id
@@ -30,8 +28,14 @@ public class DeviceProfile {
     private String osVersion;
     
     @Column(nullable = false)
-    private LocalDateTime lastSeen = LocalDateTime.now();
+    private LocalDateTime lastSeen;
     
     @Column(nullable = false)
     private Boolean isTrusted = false;
+    
+    @PrePersist
+    @PreUpdate
+    protected void onUpdate() {
+        lastSeen = LocalDateTime.now();
+    }
 }

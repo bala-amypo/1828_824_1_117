@@ -6,7 +6,6 @@ import com.example.demo.service.LoginEventService;
 import com.example.demo.util.RuleEvaluationUtil;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.util.List;
 
 @Service
@@ -16,6 +15,7 @@ public class LoginEventServiceImpl implements LoginEventService {
     private final LoginEventRepository loginEventRepository;
     private final RuleEvaluationUtil ruleEvaluationUtil;
     
+    // EXACT CONSTRUCTOR SIGNATURE AS REQUIRED
     public LoginEventServiceImpl(LoginEventRepository loginEventRepository,
                                 RuleEvaluationUtil ruleEvaluationUtil) {
         this.loginEventRepository = loginEventRepository;
@@ -24,9 +24,20 @@ public class LoginEventServiceImpl implements LoginEventService {
     
     @Override
     public LoginEvent recordLogin(LoginEvent event) {
+        // Validate required fields
+        if (event.getIpAddress() == null || event.getIpAddress().trim().isEmpty()) {
+            throw new IllegalArgumentException("IP address cannot be null");
+        }
+        if (event.getDeviceId() == null || event.getDeviceId().trim().isEmpty()) {
+            throw new IllegalArgumentException("Device ID cannot be null");
+        }
+        
+        // Save the event
         LoginEvent savedEvent = loginEventRepository.save(event);
-        // Evaluate rules after saving
+        
+        // Evaluate rules
         ruleEvaluationUtil.evaluateLoginEvent(savedEvent);
+        
         return savedEvent;
     }
     
@@ -37,7 +48,6 @@ public class LoginEventServiceImpl implements LoginEventService {
     
     @Override
     public List<LoginEvent> getSuspiciousLogins(Long userId) {
-        // Get failed login attempts
         return loginEventRepository.findByUserIdAndLoginStatus(userId, "FAILED");
     }
     

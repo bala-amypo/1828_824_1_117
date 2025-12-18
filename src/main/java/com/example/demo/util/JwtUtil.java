@@ -9,21 +9,15 @@ import org.springframework.stereotype.Component;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.Function;
 
 @Component
 public class JwtUtil {
     
-    @Value("${jwt.secret}")
     private String secret;
-    
-    @Value("${jwt.validity}")
     private long validityInMs;
-    
-    @Value("${jwt.test-mode}")
     private boolean isTestMode;
     
-    
+    // EXACT CONSTRUCTOR SIGNATURE AS REQUIRED
     public JwtUtil(@Value("${jwt.secret}") String secret, 
                    @Value("${jwt.validity}") long validityInMs, 
                    @Value("${jwt.test-mode}") boolean isTestMode) {
@@ -32,69 +26,50 @@ public class JwtUtil {
         this.isTestMode = isTestMode;
     }
     
-   
+    // Default constructor for Spring
     public JwtUtil() {
-        
     }
     
-    
-    private String getSigningKey() {
-        if (isTestMode) {
-            return "test-secret-key-for-jwt-in-test-mode-1234567890";
-        }
-        return secret;
-    }
-    
-    public String extractUsername(String token) {
-        return extractClaim(token, Claims::getSubject);
-    }
-    
-    public Date extractExpiration(String token) {
-        return extractClaim(token, Claims::getExpiration);
-    }
-    
-    public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
-        final Claims claims = extractAllClaims(token);
-        return claimsResolver.apply(claims);
-    }
-    
-    private Claims extractAllClaims(String token) {
-        return Jwts.parser()
-                .setSigningKey(getSigningKey())
-                .parseClaimsJws(token)
-                .getBody();
-    }
-    
-    public Boolean isTokenExpired(String token) {
-        return extractExpiration(token).before(new Date());
-    }
-    
-    public String generateToken(String username) {
+    public String generateToken(String subject, Long userId, String email, String role) {
         Map<String, Object> claims = new HashMap<>();
-        return createToken(claims, username);
-    }
-    
-    private String createToken(Map<String, Object> claims, String subject) {
+        claims.put("userId", userId);
+        claims.put("email", email);
+        claims.put("role", role);
+        
         return Jwts.builder()
                 .setClaims(claims)
                 .setSubject(subject)
-                .setIssuedAt(new Date(System.currentTimeMillis()))
+                .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + validityInMs))
-                .signWith(SignatureAlgorithm.HS512, getSigningKey())
+                .signWith(SignatureAlgorithm.HS512, secret)
                 .compact();
     }
     
-    public Boolean validateToken(String token, String username) {
-        final String extractedUsername = extractUsername(token);
-        return (extractedUsername.equals(username) && !isTokenExpired(token));
-    }
-    
-    public Boolean validateToken(String token) {
+    public boolean validateToken(String token) {
         try {
-            Jwts.parser().setSigningKey(getSigningKey()).parseClaimsJws(token);
+            Jwts.parser().setSigningKey(secret).parseClaimsJws(token);
             return true;
         } catch (Exception e) {
             return false;
         }
+    }
+    
+    public String getEmail(String token) {
+        return getClaimsFromToken(token).get("email", String.class);
+    }
+    
+    public String getRole(String token) {
+        return getClaimsFromToken(token).get("role", String.class);
+    }
+    
+    public Long getUserId(String token) {
+        return getClaimsFromToken(token).get("userId", Long.class);
+    }
+    
+    private Claims getClaimsFromToken(String token) {
+        return Jwts.parser()
+                .setSigningKey(secret)
+                .parseClaimsJws(token)
+                .getBody();
     }
 }

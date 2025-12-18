@@ -1,5 +1,6 @@
 package com.example.demo.controller;
 
+import com.example.demo.dto.JwtResponse;
 import com.example.demo.dto.LoginRequest;
 import com.example.demo.dto.RegisterRequest;
 import com.example.demo.entity.UserAccount;
@@ -13,10 +14,10 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Optional;
 
 @Tag(name = "Authentication", description = "Authentication endpoints")
 @RestController
@@ -26,27 +27,22 @@ public class AuthController {
     private final AuthenticationManager authenticationManager;
     private final JwtUtil jwtUtil;
     private final UserAccountService userAccountService;
+    private final PasswordEncoder passwordEncoder;
     
     public AuthController(AuthenticationManager authenticationManager,
                          JwtUtil jwtUtil,
-                         UserAccountService userAccountService) {
+                         UserAccountService userAccountService,
+                         PasswordEncoder passwordEncoder) {
         this.authenticationManager = authenticationManager;
         this.jwtUtil = jwtUtil;
         this.userAccountService = userAccountService;
+        this.passwordEncoder = passwordEncoder;
     }
     
     @Operation(summary = "Register a new user")
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody RegisterRequest request) {
         try {
-            if (userAccountService.existsByUsername(request.getUsername())) {
-                return ResponseEntity.badRequest().body("Username already exists");
-            }
-            
-            if (request.getEmail() != null && userAccountService.existsByEmail(request.getEmail())) {
-                return ResponseEntity.badRequest().body("Email already exists");
-            }
-            
             UserAccount user = new UserAccount();
             user.setEmployeeId(request.getEmployeeId());
             user.setUsername(request.getUsername());
@@ -57,14 +53,12 @@ public class AuthController {
             
             UserAccount createdUser = userAccountService.createUser(user);
             
-            Map<String, Object> response = new HashMap<>();
-            response.put("message", "User registered successfully");
-            response.put("userId", createdUser.getId());
+            return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
             
-            return ResponseEntity.status(HttpStatus.CREATED).body(response);
-            
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Registration failed: " + e.getMessage());
+            return ResponseEntity.badRequest().body("Registration failed");
         }
     }
     
@@ -72,20 +66,38 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest request) {
         try {
+            // Find user by username or email
+            Optional<UserAccount> userOpt = userAccountService.findByUsername(request.getUsernameOrEmail());
+            if (userOpt.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
+            }
+            
+            UserAccount user = userOpt.get();
+            
+            // Authenticate
             Authentication authentication = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(
-                            request.getUsername(),
-                            request.getPassword()
-                    )
+                new UsernamePasswordAuthenticationToken(
+                    user.getUsername(),
+                    request.getPassword()
+                )
             );
             
             SecurityContextHolder.getContext().setAuthentication(authentication);
-            String jwt = jwtUtil.generateToken(request.getUsername());
             
-            Map<String, Object> response = new HashMap<>();
-            response.put("token", jwt);
-            response.put("username", request.getUsername());
-            response.put("message", "Login successful");
+            // Generate token
+            String token = jwtUtil.generateToken(
+                user.getUsername(),
+                user.getId(),
+                user.getEmail(),
+                user.getRole()
+            );
+            
+            JwtResponse response = new JwtResponse(
+                token,
+                user.getId(),
+                user.getEmail(),
+                user.getRole()
+            );
             
             return ResponseEntity.ok(response);
             

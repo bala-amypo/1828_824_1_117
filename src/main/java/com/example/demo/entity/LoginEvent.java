@@ -29,8 +29,15 @@ public class LoginEvent {
     private String deviceId;
     
     @Column(nullable = false)
-    private LocalDateTime timestamp = LocalDateTime.now();
+    private LocalDateTime timestamp;
     
     @Column(nullable = false)
-    private String loginStatus; // SUCCESS, FAILED
+    private String loginStatus; 
+    
+    @PrePersist
+    protected void onCreate() {
+        if (timestamp == null) {
+            timestamp = LocalDateTime.now();
+        }
+    }
 }

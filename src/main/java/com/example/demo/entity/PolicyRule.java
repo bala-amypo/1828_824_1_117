@@ -24,7 +24,7 @@ public class PolicyRule {
     private String description;
     
     @Column(nullable = false)
-    private String severity; // LOW, MEDIUM, HIGH, CRITICAL
+    private String severity; 
     
     @Column(columnDefinition = "TEXT")
     private String conditionsJson;

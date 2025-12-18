@@ -33,11 +33,18 @@ public class ViolationRecord {
     private String details;
     
     @Column(nullable = false)
-    private String severity; // Inherited from PolicyRule
+    private String severity; 
     
     @Column(nullable = false)
-    private LocalDateTime detectedAt = LocalDateTime.now();
+    private LocalDateTime detectedAt;
     
     @Column(nullable = false)
     private Boolean resolved = false;
+    
+    @PrePersist
+    protected void onCreate() {
+        if (detectedAt == null) {
+            detectedAt = LocalDateTime.now();
+        }
+    }
 }

@@ -34,11 +34,16 @@ public class UserAccount {
     private String password;
     
     @Column(nullable = false)
-    private String role = "USER"; // ADMIN, USER, AUDITOR
+    private String role = "USER"; 
     
     @Column(nullable = false)
-    private String status = "ACTIVE"; // ACTIVE, SUSPENDED
+    private String status = "ACTIVE"; 
     
     @Column(nullable = false, updatable = false)
-    private LocalDateTime createdAt = LocalDateTime.now();
+    private LocalDateTime createdAt;
+    
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+    }
 }

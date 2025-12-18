@@ -5,8 +5,6 @@ import com.example.demo.repository.ViolationRecordRepository;
 import com.example.demo.service.ViolationRecordService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -15,6 +13,7 @@ public class ViolationRecordServiceImpl implements ViolationRecordService {
     
     private final ViolationRecordRepository violationRecordRepository;
     
+    // EXACT CONSTRUCTOR SIGNATURE AS REQUIRED
     public ViolationRecordServiceImpl(ViolationRecordRepository violationRecordRepository) {
         this.violationRecordRepository = violationRecordRepository;
     }
