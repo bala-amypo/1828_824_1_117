@@ -15,83 +15,70 @@ public class LoginEvent {
     private Long userId;
 
     @Column(nullable = false)
+    private String username;
+
     private String ipAddress;
+
+    private String userAgent;
+
+    @Column(nullable = false)
+    private LocalDateTime eventTime;
+
+    private String status; // SUCCESS, FAILED, SUSPICIOUS, etc.
 
     private String location;
 
-    @Column(nullable = false)
-    private String deviceId;
+    private String deviceInfo;
 
-    private LocalDateTime timestamp = LocalDateTime.now();
+    private Boolean suspicious = false;
 
-    @Column(nullable = false)
-    private String loginStatus; 
+    private String suspicionReason;
 
+    // Constructors
     public LoginEvent() {
+        this.eventTime = LocalDateTime.now();
     }
 
-    public LoginEvent(Long userId, String ipAddress, String location, String deviceId, String loginStatus) {
+    public LoginEvent(Long userId, String username, String ipAddress, String userAgent, String status) {
         this.userId = userId;
+        this.username = username;
         this.ipAddress = ipAddress;
-        this.location = location;
-        this.deviceId = deviceId;
-        this.loginStatus = loginStatus;
-        this.timestamp = LocalDateTime.now();
+        this.userAgent = userAgent;
+        this.status = status;
+        this.eventTime = LocalDateTime.now();
     }
 
-    public Long getId() {
-        return id;
-    }
+    // Getters and Setters
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+    public Long getUserId() { return userId; }
+    public void setUserId(Long userId) { this.userId = userId; }
 
-    public Long getUserId() {
-        return userId;
-    }
+    public String getUsername() { return username; }
+    public void setUsername(String username) { this.username = username; }
 
-    public void setUserId(Long userId) {
-        this.userId = userId;
-    }
+    public String getIpAddress() { return ipAddress; }
+    public void setIpAddress(String ipAddress) { this.ipAddress = ipAddress; }
 
-    public String getIpAddress() {
-        return ipAddress;
-    }
+    public String getUserAgent() { return userAgent; }
+    public void setUserAgent(String userAgent) { this.userAgent = userAgent; }
 
-    public void setIpAddress(String ipAddress) {
-        this.ipAddress = ipAddress;
-    }
+    public LocalDateTime getEventTime() { return eventTime; }
+    public void setEventTime(LocalDateTime eventTime) { this.eventTime = eventTime; }
 
-    public String getLocation() {
-        return location;
-    }
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
 
-    public void setLocation(String location) {
-        this.location = location;
-    }
+    public String getLocation() { return location; }
+    public void setLocation(String location) { this.location = location; }
 
-    public String getDeviceId() {
-        return deviceId;
-    }
+    public String getDeviceInfo() { return deviceInfo; }
+    public void setDeviceInfo(String deviceInfo) { this.deviceInfo = deviceInfo; }
 
-    public void setDeviceId(String deviceId) {
-        this.deviceId = deviceId;
-    }
+    public Boolean getSuspicious() { return suspicious; }
+    public void setSuspicious(Boolean suspicious) { this.suspicious = suspicious; }
 
-    public LocalDateTime getTimestamp() {
-        return timestamp;
-    }
-
-    public void setTimestamp(LocalDateTime timestamp) {
-        this.timestamp = timestamp;
-    }
-
-    public String getLoginStatus() {
-        return loginStatus;
-    }
-
-    public void setLoginStatus(String loginStatus) {
-        this.loginStatus = loginStatus;
-    }
+    public String getSuspicionReason() { return suspicionReason; }
+    public void setSuspicionReason(String suspicionReason) { this.suspicionReason = suspicionReason; }
 }
