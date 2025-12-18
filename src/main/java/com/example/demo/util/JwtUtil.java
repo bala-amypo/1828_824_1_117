@@ -66,7 +66,12 @@ public class JwtUtil {
         return getClaimsFromToken(token).get("userId", Long.class);
     }
     
-    private Claims getClaimsFromToken(String token) {
+    public String getSubject(String token) {
+        return getClaimsFromToken(token).getSubject();
+    }
+    
+    // CHANGE FROM PRIVATE TO PUBLIC
+    public Claims getClaimsFromToken(String token) {
         return Jwts.parser()
                 .setSigningKey(secret)
                 .parseClaimsJws(token)
