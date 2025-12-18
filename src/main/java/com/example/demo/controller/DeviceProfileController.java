@@ -10,8 +10,9 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
-@Tag(name = "Device Profiles", description = "Device profile management")
+@Tag(name = "Device Management", description = "Device profile management")
 @RestController
 @RequestMapping("/api/devices")
 public class DeviceProfileController {
@@ -47,12 +48,12 @@ public class DeviceProfileController {
         return ResponseEntity.ok(devices);
     }
     
-    @Operation(summary = "Find device by device ID")
+    @Operation(summary = "Lookup device by device ID")
     @GetMapping("/lookup/{deviceId}")
     @PreAuthorize("hasAnyAuthority('ADMIN', 'AUDITOR')")
     public ResponseEntity<DeviceProfile> findByDeviceId(@PathVariable String deviceId) {
-        return deviceProfileService.findByDeviceId(deviceId)
-                .map(ResponseEntity::ok)
+        Optional<DeviceProfile> device = deviceProfileService.findByDeviceId(deviceId);
+        return device.map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 }

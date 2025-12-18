@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@Tag(name = "User Accounts", description = "User account management")
+@Tag(name = "User Management", description = "User account management")
 @RestController
 @RequestMapping("/api/users")
 public class UserAccountController {
@@ -34,9 +34,8 @@ public class UserAccountController {
     @GetMapping("/{id}")
     @PreAuthorize("hasAnyAuthority('ADMIN', 'AUDITOR')")
     public ResponseEntity<UserAccount> getUserById(@PathVariable Long id) {
-        return userAccountService.getUserById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+        UserAccount user = userAccountService.getUserById(id);
+        return ResponseEntity.ok(user);
     }
     
     @Operation(summary = "Update account status")
