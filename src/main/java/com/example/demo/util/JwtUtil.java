@@ -23,7 +23,7 @@ public class JwtUtil {
     @Value("${jwt.test-mode}")
     private boolean isTestMode;
     
-    // Constructor as required by the question
+    
     public JwtUtil(@Value("${jwt.secret}") String secret, 
                    @Value("${jwt.validity}") long validityInMs, 
                    @Value("${jwt.test-mode}") boolean isTestMode) {
@@ -32,12 +32,12 @@ public class JwtUtil {
         this.isTestMode = isTestMode;
     }
     
-    // Default constructor for Spring
+   
     public JwtUtil() {
-        // Spring will inject values via @Value
+        
     }
     
-    // For test mode, use a simpler key
+    
     private String getSigningKey() {
         if (isTestMode) {
             return "test-secret-key-for-jwt-in-test-mode-1234567890";
