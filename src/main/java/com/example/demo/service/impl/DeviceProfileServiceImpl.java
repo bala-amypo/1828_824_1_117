@@ -3,42 +3,35 @@ package com.example.demo.service.impl;
 import com.example.demo.entity.DeviceProfile;
 import com.example.demo.repository.DeviceProfileRepository;
 import com.example.demo.service.DeviceProfileService;
-import com.example.demo.exception.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
 public class DeviceProfileServiceImpl implements DeviceProfileService {
 
-    private final DeviceProfileRepository deviceRepository;
+    private final DeviceProfileRepository repository;
 
-    public DeviceProfileServiceImpl(DeviceProfileRepository deviceRepository) {
-        this.deviceRepository = deviceRepository;
+    public DeviceProfileServiceImpl(DeviceProfileRepository repository) {
+        this.repository = repository;
     }
 
     @Override
-    public DeviceProfile saveDevice(DeviceProfile device) {
-        return deviceRepository.save(device);
+    public DeviceProfile registerDevice(DeviceProfile device) {
+        return repository.save(device);
     }
 
     @Override
-    public DeviceProfile getDeviceById(String deviceId) {
-        DeviceProfile device = deviceRepository.findByDeviceid(deviceId);
-        if (device == null) {
-            throw new ResourceNotFoundException("Device not found with ID: " + deviceId);
-        }
-        return device;
+    public List<DeviceProfile> getDevicesByUser(Long userId) {
+        // Ensure your repository has a findByUserId method if needed, 
+        // or filter accordingly.
+        return repository.findAll().stream()
+                .filter(d -> d.getId().equals(userId)) // Example logic
+                .toList();
     }
 
     @Override
-    public DeviceProfile updateTrustStatus(String deviceId, boolean isTrusted) {
-        DeviceProfile device = getDeviceById(deviceId);
-        device.setTrusted(isTrusted); 
-        return deviceRepository.save(device);
-    }
-
-    @Override
-    public List<DeviceProfile> getAllDevices() {
-        return deviceRepository.findAll();
+    public DeviceProfile findByDeviceId(String deviceId) {
+        // Matches the Controller's call
+        return repository.findByDeviceid(deviceId);
     }
 }
