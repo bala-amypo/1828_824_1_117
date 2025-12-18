@@ -12,7 +12,7 @@ import java.io.IOException;
 
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
-    // Standard JWT Filter logic...
+    
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) 
             throws ServletException, IOException {
