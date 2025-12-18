@@ -18,13 +18,12 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Tag(name = "Authentication", description = "User authentication and registration endpoints")
 @RestController
-@RequestMapping("/api/auth")  // Changed to /api/auth to match your security config
+@RequestMapping("/api/auth")
 public class AuthController {
 
     private final AuthenticationManager authenticationManager;
@@ -56,7 +55,9 @@ public class AuthController {
             SecurityContextHolder.getContext().setAuthentication(authentication);
             String jwt = jwtUtil.generateToken(authentication);
 
-            UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+            org.springframework.security.core.userdetails.UserDetails userDetails = 
+                (org.springframework.security.core.userdetails.UserDetails) authentication.getPrincipal();
+            
             List<String> roles = userDetails.getAuthorities().stream()
                     .map(GrantedAuthority::getAuthority)
                     .collect(Collectors.toList());
@@ -66,12 +67,12 @@ public class AuthController {
             
             JwtResponse response = new JwtResponse();
             response.setToken(jwt);
-            response.setId(userDetails.getId());
             response.setUsername(userDetails.getUsername());
-            response.setEmail(userDetails.getEmail());
             response.setRoles(roles);
             
             if (userOpt.isPresent()) {
+                response.setId(userOpt.get().getId());
+                response.setEmail(userOpt.get().getEmail());
                 response.setEmployeeId(userOpt.get().getEmployeeId());
             }
 
@@ -100,7 +101,8 @@ public class AuthController {
             }
 
             // Check if employeeId exists
-            if (userAccountRepository.existsByEmployeeId(registerRequest.getEmployeeId())) {
+            if (registerRequest.getEmployeeId() != null && 
+                userAccountRepository.existsByEmployeeId(registerRequest.getEmployeeId())) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                         .body("{\"error\": \"Employee ID already exists!\"}");
             }
@@ -124,7 +126,9 @@ public class AuthController {
             );
 
             String jwt = jwtUtil.generateToken(authentication);
-            UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+            org.springframework.security.core.userdetails.UserDetails userDetails = 
+                (org.springframework.security.core.userdetails.UserDetails) authentication.getPrincipal();
+            
             List<String> roles = userDetails.getAuthorities().stream()
                     .map(GrantedAuthority::getAuthority)
                     .collect(Collectors.toList());
@@ -150,7 +154,9 @@ public class AuthController {
     @GetMapping("/check-username/{username}")
     public ResponseEntity<?> checkUsername(@PathVariable String username) {
         boolean exists = userAccountRepository.existsByUsername(username);
-        return ResponseEntity.ok("{\"exists\": " + exists + "}");
+        Map<String, Boolean> response = new HashMap<>();
+        response.put("exists", exists);
+        return ResponseEntity.ok(response);
     }
 
     @Operation(summary = "Get current user info")
@@ -158,7 +164,8 @@ public class AuthController {
     public ResponseEntity<?> getCurrentUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         
-        if (authentication == null || !authentication.isAuthenticated()) {
+        if (authentication == null || !authentication.isAuthenticated() || 
+            authentication.getName().equals("anonymousUser")) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
@@ -173,48 +180,4 @@ public class AuthController {
         UserAccount user = userOpt.get();
         return ResponseEntity.ok(user);
     }
-}
-
-// Helper class for UserDetails
-class UserDetailsImpl implements org.springframework.security.core.userdetails.UserDetails {
-    private final Long id;
-    private final String username;
-    private final String email;
-    private final String password;
-    private final List<GrantedAuthority> authorities;
-
-    public UserDetailsImpl(Long id, String username, String email, String password,
-                          List<GrantedAuthority> authorities) {
-        this.id = id;
-        this.username = username;
-        this.email = email;
-        this.password = password;
-        this.authorities = authorities;
-    }
-
-    public Long getId() { return id; }
-    public String getEmail() { return email; }
-
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return authorities;
-    }
-
-    @Override
-    public String getPassword() { return password; }
-
-    @Override
-    public String getUsername() { return username; }
-
-    @Override
-    public boolean isAccountNonExpired() { return true; }
-
-    @Override
-    public boolean isAccountNonLocked() { return true; }
-
-    @Override
-    public boolean isCredentialsNonExpired() { return true; }
-
-    @Override
-    public boolean isEnabled() { return true; }
 }

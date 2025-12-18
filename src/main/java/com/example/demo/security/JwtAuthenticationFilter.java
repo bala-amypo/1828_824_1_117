@@ -9,7 +9,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
-import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -31,8 +30,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         
         // Skip filtering for public endpoints
         String path = request.getServletPath();
-        if (path.startsWith("/auth/") || 
-            path.startsWith("/api/auth/") || 
+        if (path.startsWith("/api/auth/") || 
+            path.startsWith("/auth/") || 
             path.startsWith("/swagger-ui/") || 
             path.startsWith("/v3/api-docs") ||
             path.startsWith("/actuator/health") ||

@@ -1,12 +1,12 @@
 package com.example.demo.security;
 
-import io.jsonwebtoken.*;
-import io.jsonwebtoken.security.Keys;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
-import java.security.Key;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -18,18 +18,12 @@ public class JwtUtil {
     @Value("${jwt.secret}")
     private String secret;
 
-    @Value("${jwt.expiration}")
-    private Long expiration;
+    @Value("${jwt.validity}")
+    private Long jwtValidity;
 
-    private Key getSigningKey() {
-        byte[] keyBytes = secret.getBytes();
-        if (keyBytes.length < 32) {
-            // Pad the secret if it's too short
-            byte[] padded = new byte[32];
-            System.arraycopy(keyBytes, 0, padded, 0, Math.min(keyBytes.length, 32));
-            return Keys.hmacShaKeyFor(padded);
-        }
-        return Keys.hmacShaKeyFor(keyBytes);
+    public String generateToken(Authentication authentication) {
+        Map<String, Object> claims = new HashMap<>();
+        return createToken(claims, authentication.getName());
     }
 
     public String generateToken(String username) {
@@ -42,8 +36,8 @@ public class JwtUtil {
                 .setClaims(claims)
                 .setSubject(subject)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + expiration * 1000))
-                .signWith(getSigningKey(), SignatureAlgorithm.HS256)
+                .setExpiration(new Date(System.currentTimeMillis() + jwtValidity))
+                .signWith(SignatureAlgorithm.HS256, secret)
                 .compact();
     }
 
@@ -66,17 +60,10 @@ public class JwtUtil {
     }
 
     private Claims extractAllClaims(String token) {
-        try {
-            return Jwts.parserBuilder()
-                    .setSigningKey(getSigningKey())
-                    .build()
-                    .parseClaimsJws(token)
-                    .getBody();
-        } catch (ExpiredJwtException e) {
-            throw new RuntimeException("JWT token expired", e);
-        } catch (Exception e) {
-            throw new RuntimeException("Invalid JWT token", e);
-        }
+        return Jwts.parser()
+                .setSigningKey(secret)
+                .parseClaimsJws(token)
+                .getBody();
     }
 
     private Boolean isTokenExpired(String token) {
