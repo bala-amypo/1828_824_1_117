@@ -16,6 +16,11 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.Arrays;
 
 @Configuration
 @EnableWebSecurity
@@ -53,18 +58,61 @@ public class SecurityConfig {
     }
 
     @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000", "http://localhost:8080"));
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
+        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "X-Requested-With", "Accept"));
+        configuration.setExposedHeaders(Arrays.asList("Authorization"));
+        configuration.setAllowCredentials(true);
+        configuration.setMaxAge(3600L);
+        
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
+    }
+
+    @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http.csrf(csrf -> csrf.disable())
+        http
+            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+            .csrf(csrf -> csrf.disable())
             .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> 
-                auth.requestMatchers("/api/auth/**").permitAll()  // ✅ This allows /api/auth/register
-                    .requestMatchers("/auth/**").permitAll()      // ✅ Also allow /auth/register for compatibility
-                    .requestMatchers("/api/logins/record").permitAll()
-                    .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html").permitAll()
-                    .requestMatchers("/actuator/health").permitAll()
-                    .anyRequest().authenticated()
+                auth.requestMatchers(
+                    // Authentication endpoints
+                    "/api/auth/**", 
+                    "/auth/**",
+                    
+                    // Public API endpoints
+                    "/api/logins/record",
+                    "/api/users/exists/username/**",
+                    "/api/users/exists/email/**",
+                    
+                    // Documentation
+                    "/swagger-ui/**", 
+                    "/v3/api-docs/**", 
+                    "/swagger-ui.html",
+                    "/swagger-resources/**",
+                    "/webjars/**",
+                    
+                    // Health check
+                    "/actuator/health",
+                    "/actuator/info",
+                    
+                    // Static resources (optional)
+                    "/error",
+                    "/favicon.ico",
+                    
+                    // H2 Console (for development only - remove in production)
+                    "/h2-console/**"
+                ).permitAll()
+                .anyRequest().authenticated()
             );
+
+        // For H2 Console (development only)
+        http.headers(headers -> headers.frameOptions(frame -> frame.sameOrigin()));
 
         http.authenticationProvider(authenticationProvider());
         http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
