@@ -20,7 +20,6 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.Arrays;
-import java.util.List;
 
 @Configuration
 @EnableWebSecurity
@@ -57,31 +56,10 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        
-        // Allow specific origins
-        List<String> allowedOrigins = Arrays.asList(
-            "https://9082.pro604cr.amypo.ai",
-            "http://9082.pro604cr.amypo.ai",
-            "https://localhost:9001",
-            "http://localhost:9001",
-            "http://localhost:3000"
-        );
-        configuration.setAllowedOrigins(allowedOrigins);
-        
-        // Allow all methods
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH", "HEAD"));
-        
-        // Allow all headers
+        configuration.setAllowedOrigins(Arrays.asList("*"));
+        configuration.setAllowedMethods(Arrays.asList("*"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
-        
-        // Expose headers
-        configuration.setExposedHeaders(Arrays.asList("Authorization", "Content-Type"));
-        
-        // Allow credentials
-        configuration.setAllowCredentials(true);
-        
-        // Max age
-        configuration.setMaxAge(3600L);
+        configuration.setExposedHeaders(Arrays.asList("Authorization"));
         
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
@@ -96,7 +74,7 @@ public class SecurityConfig {
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> 
                 auth.requestMatchers(
-                    // ========== ALL PUBLIC ENDPOINTS ==========
+                    // ========== PUBLIC ENDPOINTS ==========
                     "/auth/**",
                     "/api/logins/record",
                     "/status",
@@ -105,13 +83,19 @@ public class SecurityConfig {
                     "/info",
                     "/test",
                     
-                    // ========== SWAGGER/OPENAPI ==========
+                    // ========== SWAGGER ==========
                     "/swagger-ui/**",
                     "/v3/api-docs/**",
                     "/api-docs/**",
                     "/swagger-resources/**",
                     "/webjars/**"
                 ).permitAll()
+                // ========== PROTECTED ENDPOINTS ==========
+                .requestMatchers("/api/users/**").hasAnyAuthority("ADMIN", "AUDITOR")
+                .requestMatchers("/api/logins/**").hasAnyAuthority("ADMIN", "AUDITOR")
+                .requestMatchers("/api/devices/**").hasAnyAuthority("ADMIN", "AUDITOR", "USER")
+                .requestMatchers("/api/rules/**").hasAnyAuthority("ADMIN", "AUDITOR")
+                .requestMatchers("/api/violations/**").hasAnyAuthority("ADMIN", "AUDITOR")
                 .anyRequest().authenticated()
             );
         
