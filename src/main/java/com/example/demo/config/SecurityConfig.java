@@ -54,30 +54,28 @@ public class SecurityConfig {
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> 
                 auth.requestMatchers(
-                    // ========== AUTHENTICATION & HEALTH ENDPOINTS ==========
-                    "/auth/**",                    // All auth endpoints including /health, /, /info
                     
-                    // ========== PUBLIC API ENDPOINTS ==========
-                    "/api/logins/record",          // Public login recording
+                    "/auth/**",                    
                     
-                    // ========== SERVLET STATUS ==========
-                    "/status",                     // Servlet status
                     
-                    // ========== ROOT ENDPOINTS ==========
-                    "/",                           // Root (if you have a separate controller)
-                    "/health",                     // Alternative health endpoint
-                    "/info",                       // Alternative info endpoint
+                    "/api/logins/record",          
                     
-                    // ========== SWAGGER/OPENAPI DOCUMENTATION ==========
-                    "/swagger-ui/**",              // Swagger UI
-                    "/swagger-ui.html",            // Swagger UI HTML
-                    "/v3/api-docs/**",             // OpenAPI JSON docs
-                    "/api-docs/**",                // API docs
-                    "/swagger-resources/**",       // Swagger resources
-                    "/swagger-resources",          // Swagger resources
-                    "/webjars/**",                 // WebJars
-                    "/favicon.ico",                // Favicon
-                    "/error"                       // Error pages
+                    
+                    "/status",                    
+                    "/",                           
+                    "/health",                     
+                    "/info",                       
+                    
+                    
+                    "/swagger-ui/**",              
+                    "/swagger-ui.html",            
+                    "/v3/api-docs/**",             
+                    "/api-docs/**",                
+                    "/swagger-resources/**",       
+                    "/swagger-resources",          
+                    "/webjars/**",                 
+                    "/favicon.ico",                
+                    "/error"                       
                 ).permitAll()
                 .anyRequest().authenticated()
             );
