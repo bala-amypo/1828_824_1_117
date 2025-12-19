@@ -5,8 +5,11 @@ import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
+import io.swagger.v3.oas.models.servers.Server;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import java.util.List;
 
 @Configuration
 public class OpenApiConfig {
@@ -16,26 +19,28 @@ public class OpenApiConfig {
         final String securitySchemeName = "bearerAuth";
         
         return new OpenAPI()
+                .servers(List.of(
+                        new Server()
+                                .url("https://9082.pro604cr.amypo.ai")
+                                .description("Production Server")
+                ))
                 .info(new Info()
                         .title("IT Policy Violation Detection API")
                         .description("""
                             ### API Documentation
                             
-                            This system captures and analyzes user login activity, device usage, and security events 
-                            to detect potential IT policy violations across an organization.
+                            **Important:** Use the "Try it out" button above to test endpoints.
                             
-                            ### Features:
-                            - User authentication and authorization with JWT
-                            - Login event tracking and analysis
-                            - Device profile management
-                            - Configurable policy rules
-                            - Violation detection and reporting
-                            - Role-based access control (ADMIN, AUDITOR, USER)
+                            ### Quick Start:
+                            1. Register a user: `POST /auth/register`
+                            2. Login: `POST /auth/login` (copy the token)
+                            3. Click "Authorize" button (🔒) and paste: `Bearer YOUR_TOKEN`
+                            4. Test protected endpoints
                             
                             ### Authentication:
-                            - Register at `/auth/register`
-                            - Login at `/auth/login` to get JWT token
-                            - Include token in header: `Authorization: Bearer <token>`
+                            - Register: `POST /auth/register`
+                            - Login: `POST /auth/login`
+                            - Token format: `Authorization: Bearer {token}`
                             """)
                         .version("1.0.0"))
                 .addSecurityItem(new SecurityRequirement().addList(securitySchemeName))
@@ -45,6 +50,7 @@ public class OpenApiConfig {
                                         .name(securitySchemeName)
                                         .type(SecurityScheme.Type.HTTP)
                                         .scheme("bearer")
-                                        .bearerFormat("JWT")));
+                                        .bearerFormat("JWT")
+                                        .description("Enter JWT token in format: Bearer YOUR_TOKEN")));
     }
 }
