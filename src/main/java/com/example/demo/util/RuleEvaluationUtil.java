@@ -16,7 +16,7 @@ public class RuleEvaluationUtil {
     private final PolicyRuleRepository policyRuleRepository;
     private final ViolationRecordRepository violationRecordRepository;
     
-    // EXACT CONSTRUCTOR SIGNATURE AS REQUIRED
+    
     public RuleEvaluationUtil(PolicyRuleRepository policyRuleRepository,
                              ViolationRecordRepository violationRecordRepository) {
         this.policyRuleRepository = policyRuleRepository;
@@ -34,13 +34,13 @@ public class RuleEvaluationUtil {
     }
     
     private boolean evaluateRule(LoginEvent event, PolicyRule rule) {
-        // Basic evaluation: Check for failed login attempts
+        // evaluation: Check for failed login attempts
         if ("FAILED".equals(event.getLoginStatus())) {
             return true;
         }
         
-        // Add more complex rule evaluation logic here
-        // For now, we'll keep it simple
+        // Add complex rule evaluation logic here
+        // 
         return false;
     }
     
