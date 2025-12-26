@@ -1,59 +1,37 @@
 package com.example.demo.entity;
-
-import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
 import java.time.LocalDateTime;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
 @Entity
-@Table(name = "user_accounts", uniqueConstraints = {
-    @UniqueConstraint(columnNames = "employeeId"),
-    @UniqueConstraint(columnNames = "username"),
-    @UniqueConstraint(columnNames = "email")
-})
-@Schema(description = "User account entity")
 public class UserAccount {
-    
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Schema(description = "User ID", example = "1")
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    
-    @Column(unique = true, nullable = false)
-    @Schema(description = "Employee ID", example = "EMP001", required = true)
     private String employeeId;
-    
-    @Column(unique = true, nullable = false)
-    @Schema(description = "Username", example = "admin", required = true)
     private String username;
-    
-    @Column(unique = true)
-    @Schema(description = "Email", example = "admin@example.com")
     private String email;
-    
-    @Column(nullable = false)
-    @Schema(description = "Password (hashed)", example = "$2a$10$...", required = true)
     private String password;
-    
-    @Column(nullable = false)
-    @Schema(description = "Role (ADMIN, USER, AUDITOR)", example = "ADMIN", required = true)
-    private String role = "USER";
-    
-    @Column(nullable = false)
-    @Schema(description = "Status (ACTIVE, SUSPENDED)", example = "ACTIVE", required = true)
-    private String status = "ACTIVE";
-    
-    @Column(nullable = false, updatable = false)
-    @Schema(description = "Creation timestamp", example = "2024-12-19T10:30:00")
+    private String role;
+    private String status;
     private LocalDateTime createdAt;
-    
+
     @PrePersist
-    protected void onCreate() {
-        createdAt = LocalDateTime.now();
-    }
+    protected void onCreate() { this.createdAt = LocalDateTime.now(); if (status == null) status = "ACTIVE"; }
+
+    // Standard Getters/Setters
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+    public String getUsername() { return username; }
+    public void setUsername(String username) { this.username = username; }
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
+    public String getPassword() { return password; }
+    public void setPassword(String password) { this.password = password; }
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
+    public String getRole() { return role; }
+    public void setRole(String role) { this.role = role; }
+    public String getEmployeeId() { return employeeId; }
+    public void setEmployeeId(String employeeId) { this.employeeId = employeeId; }
+    public LocalDateTime getCreatedAt() { return createdAt; }
+    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
 }

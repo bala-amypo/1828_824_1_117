@@ -1,60 +1,30 @@
 package com.example.demo.util;
-
-import com.example.demo.entity.LoginEvent;
-import com.example.demo.entity.PolicyRule;
-import com.example.demo.entity.ViolationRecord;
-import com.example.demo.repository.PolicyRuleRepository;
-import com.example.demo.repository.ViolationRecordRepository;
+import com.example.demo.entity.*;
+import com.example.demo.repository.*;
 import org.springframework.stereotype.Component;
-
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Component
 public class RuleEvaluationUtil {
-    
-    private final PolicyRuleRepository policyRuleRepository;
-    private final ViolationRecordRepository violationRecordRepository;
-    
-    
-    public RuleEvaluationUtil(PolicyRuleRepository policyRuleRepository,
-                             ViolationRecordRepository violationRecordRepository) {
-        this.policyRuleRepository = policyRuleRepository;
-        this.violationRecordRepository = violationRecordRepository;
+    private final PolicyRuleRepository ruleRepo;
+    private final ViolationRecordRepository violationRepo;
+
+    public RuleEvaluationUtil(PolicyRuleRepository ruleRepo, ViolationRecordRepository violationRepo) {
+        this.ruleRepo = ruleRepo;
+        this.violationRepo = violationRepo;
     }
-    
+
     public void evaluateLoginEvent(LoginEvent event) {
-        List<PolicyRule> activeRules = policyRuleRepository.findByActiveTrue();
-        
-        for (PolicyRule rule : activeRules) {
-            if (evaluateRule(event, rule)) {
-                createViolationRecord(event, rule);
+        ruleRepo.findByActiveTrue().forEach(rule -> {
+            if (rule.getConditionsJson() != null && rule.getConditionsJson().contains(event.getLoginStatus())) {
+                ViolationRecord v = new ViolationRecord();
+                v.setUserId(event.getUserId());
+                v.setSeverity(rule.getSeverity());
+                v.setDetails("Policy Violation: " + rule.getRuleCode());
+                v.setDetectedAt(LocalDateTime.now());
+                v.setResolved(false);
+                violationRepo.save(v);
             }
-        }
-    }
-    
-    private boolean evaluateRule(LoginEvent event, PolicyRule rule) {
-        // evaluation: Check for failed login attempts
-        if ("FAILED".equals(event.getLoginStatus())) {
-            return true;
-        }
-        
-        // Add complex rule evaluation logic here
-        // 
-        return false;
-    }
-    
-    private void createViolationRecord(LoginEvent event, PolicyRule rule) {
-        ViolationRecord violation = new ViolationRecord();
-        violation.setUserId(event.getUserId());
-        violation.setPolicyRuleId(rule.getId());
-        violation.setEventId(event.getId());
-        violation.setViolationType("LOGIN_VIOLATION");
-        violation.setDetails("Policy violation detected: " + rule.getDescription());
-        violation.setSeverity(rule.getSeverity());
-        violation.setDetectedAt(LocalDateTime.now());
-        violation.setResolved(false);
-        
-        violationRecordRepository.save(violation);
+        });
     }
 }
