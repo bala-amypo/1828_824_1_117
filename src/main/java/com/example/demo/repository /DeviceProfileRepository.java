@@ -6,6 +6,6 @@ import java.util.Optional;
 import java.util.List;
 
 public interface DeviceProfileRepository extends JpaRepository<DeviceProfile, Long> {
-    Optional<DeviceProfile> findByDeviceId(String deviceId); //
     List<DeviceProfile> findByUserId(Long userId);
+    Optional<DeviceProfile> findByDeviceId(String deviceId);
 }

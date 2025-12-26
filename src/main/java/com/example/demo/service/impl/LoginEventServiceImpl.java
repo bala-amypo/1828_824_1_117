@@ -12,7 +12,6 @@ public class LoginEventServiceImpl implements LoginEventService {
     private final LoginEventRepository loginRepo;
     private final RuleEvaluationUtil ruleEvaluator;
 
-    // Constructor MUST match the test: (loginRepo, ruleEvaluator)
     public LoginEventServiceImpl(LoginEventRepository loginRepo, RuleEvaluationUtil ruleEvaluator) {
         this.loginRepo = loginRepo;
         this.ruleEvaluator = ruleEvaluator;
@@ -21,7 +20,7 @@ public class LoginEventServiceImpl implements LoginEventService {
     @Override
     public LoginEvent recordLogin(LoginEvent event) {
         LoginEvent saved = loginRepo.save(event);
-        ruleEvaluator.evaluateLoginEvent(saved); // Triggers Priorities 19-20
+        ruleEvaluator.evaluateLoginEvent(saved);
         return saved;
     }
 
@@ -33,5 +32,11 @@ public class LoginEventServiceImpl implements LoginEventService {
     @Override
     public List<LoginEvent> getSuspiciousLogins(Long userId) {
         return loginRepo.findByUserIdAndLoginStatus(userId, "FAILED");
+    }
+
+    // FIX: Add missing method required by interface
+    @Override
+    public List<LoginEvent> getAllEvents() {
+        return loginRepo.findAll();
     }
 }
