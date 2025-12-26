@@ -1,13 +1,16 @@
 package com.example.demo.service.impl;
+
 import com.example.demo.entity.UserAccount;
 import com.example.demo.repository.UserAccountRepository;
 import com.example.demo.service.UserAccountService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class UserAccountServiceImpl implements UserAccountService {
+
     private final UserAccountRepository userRepo;
     private final PasswordEncoder passwordEncoder;
 
@@ -18,6 +21,7 @@ public class UserAccountServiceImpl implements UserAccountService {
 
     @Override
     public UserAccount createUser(UserAccount user) {
+        // Encrypt password before saving
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         return userRepo.save(user);
     }
@@ -38,5 +42,13 @@ public class UserAccountServiceImpl implements UserAccountService {
     }
 
     @Override
-    public List<UserAccount> getAllUsers() { return userRepo.findAll(); }
+    public List<UserAccount> getAllUsers() {
+        return userRepo.findAll();
+    }
+
+    // FIX: Added the missing method required by the interface
+    @Override
+    public Optional<UserAccount> findByUsername(String username) {
+        return userRepo.findByUsername(username);
+    }
 }
