@@ -4,43 +4,44 @@ import com.example.demo.entity.ViolationRecord;
 import com.example.demo.repository.ViolationRecordRepository;
 import com.example.demo.service.ViolationRecordService;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 @Service
-@Transactional
 public class ViolationRecordServiceImpl implements ViolationRecordService {
-    
+
     private final ViolationRecordRepository violationRecordRepository;
-    
-    // EXACT CONSTRUCTOR SIGNATURE AS REQUIRED
+
+    // STEP 0.5 - Exact Constructor Signature Required
     public ViolationRecordServiceImpl(ViolationRecordRepository violationRecordRepository) {
         this.violationRecordRepository = violationRecordRepository;
     }
-    
+
     @Override
-    public ViolationRecord logViolation(ViolationRecord record) {
-        return violationRecordRepository.save(record);
+    public ViolationRecord logViolation(ViolationRecord violation) {
+        if (violation.getResolved() == null) {
+            violation.setResolved(false); // Default rule from Step 1.5
+        }
+        return violationRecordRepository.save(violation);
     }
-    
+
     @Override
     public List<ViolationRecord> getViolationsByUser(Long userId) {
         return violationRecordRepository.findByUserId(userId);
     }
-    
+
     @Override
     public ViolationRecord markResolved(Long id) {
-        ViolationRecord violation = violationRecordRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Violation not found"));
-        violation.setResolved(true);
-        return violationRecordRepository.save(violation);
+        return violationRecordRepository.findById(id).map(v -> {
+            v.setResolved(true);
+            return violationRecordRepository.save(v);
+        }).orElse(null);
     }
-    
+
     @Override
     public List<ViolationRecord> getUnresolvedViolations() {
         return violationRecordRepository.findByResolvedFalse();
     }
-    
+
     @Override
     public List<ViolationRecord> getAllViolations() {
         return violationRecordRepository.findAll();

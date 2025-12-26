@@ -5,6 +5,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface ViolationRecordRepository extends JpaRepository<ViolationRecord, Long> {
-    // Required for Priority 23
+    // FIX: Required for ViolationRecordServiceImpl
+    List<ViolationRecord> findByUserId(Long userId);
+
+    // FIX: Required for "getUnresolvedViolations" (Priority 23)
     List<ViolationRecord> findByResolvedFalse(); 
 }
