@@ -1,19 +1,22 @@
 package com.example.demo.security;
-import io.jsonwebtoken.*;
+
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 import java.util.Date;
 
 public class JwtUtil {
     private String secret;
     private long validity;
 
-    public JwtUtil(String secret, long validity, boolean isTestMode) {
+    public JwtUtil(String secret, long validityInMs, boolean isTestMode) {
         this.secret = secret;
-        this.validity = validity;
+        this.validity = validityInMs;
     }
 
-    public String generateToken(String sub, Long userId, String email, String role) {
+    public String generateToken(String username, Long userId, String email, String role) {
         return Jwts.builder()
-                .setSubject(sub)
+                .setSubject(username)
                 .claim("userId", userId)
                 .claim("email", email)
                 .claim("role", role)
@@ -30,6 +33,7 @@ public class JwtUtil {
         } catch (Exception e) { return false; }
     }
 
+    public String getSubject(String token) { return getClaims(token).getSubject(); }
     public String getEmail(String token) { return getClaims(token).get("email", String.class); }
     public String getRole(String token) { return getClaims(token).get("role", String.class); }
     public Long getUserId(String token) { return getClaims(token).get("userId", Long.class); }

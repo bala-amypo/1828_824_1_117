@@ -8,7 +8,6 @@ public class RuleEvaluationUtil {
     private final PolicyRuleRepository ruleRepo;
     private final ViolationRecordRepository violationRepo;
 
-    // Constructor order must match Test Class init()
     public RuleEvaluationUtil(PolicyRuleRepository ruleRepo, ViolationRecordRepository violationRepo) {
         this.ruleRepo = ruleRepo;
         this.violationRepo = violationRepo;
@@ -16,15 +15,15 @@ public class RuleEvaluationUtil {
 
     public void evaluateLoginEvent(LoginEvent event) {
         ruleRepo.findByActiveTrue().forEach(rule -> {
-            // Priority 19 logic: Match status against conditions
+            // Check if rule conditions contain the event status (e.g., "FAILED")
             if (rule.getConditionsJson() != null && rule.getConditionsJson().contains(event.getLoginStatus())) {
                 ViolationRecord v = new ViolationRecord();
                 v.setUserId(event.getUserId());
                 v.setEventId(event.getId());
-                v.setSeverity(rule.getSeverity());
-                v.setDetails("Policy Violation Triggered");
+                v.setSeverity(rule.getSeverity()); // Priority 37 & 59
+                v.setDetails("Policy Violation: " + rule.getRuleCode());
                 v.setDetectedAt(LocalDateTime.now());
-                v.setResolved(false);
+                v.setResolved(false); // Default for Priority 23/24
                 violationRepo.save(v);
             }
         });
