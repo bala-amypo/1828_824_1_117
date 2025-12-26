@@ -1,5 +1,4 @@
 package com.example.demo.service.impl;
-
 import com.example.demo.entity.LoginEvent;
 import com.example.demo.repository.LoginEventRepository;
 import com.example.demo.service.LoginEventService;
@@ -12,7 +11,6 @@ public class LoginEventServiceImpl implements LoginEventService {
     private final LoginEventRepository loginRepo;
     private final RuleEvaluationUtil ruleEvaluator;
 
-    // STEP 0.5 - Service Constructor Order: Repository first, then Util
     public LoginEventServiceImpl(LoginEventRepository loginRepo, RuleEvaluationUtil ruleEvaluator) {
         this.loginRepo = loginRepo;
         this.ruleEvaluator = ruleEvaluator;
@@ -21,18 +19,17 @@ public class LoginEventServiceImpl implements LoginEventService {
     @Override
     public LoginEvent recordLogin(LoginEvent event) {
         LoginEvent saved = loginRepo.save(event);
-        ruleEvaluator.evaluateLoginEvent(saved); // Trigger logic engine
+        ruleEvaluator.evaluateLoginEvent(saved);
         return saved;
-    }
-
-    @Override
-    public List<LoginEvent> getSuspiciousLogins(Long userId) {
-        return loginRepo.findByUserIdAndLoginStatus(userId, "FAILED");
     }
 
     @Override
     public List<LoginEvent> getEventsByUser(Long userId) { return loginRepo.findByUserId(userId); }
 
     @Override
-    public List<LoginEvent> getAllEvents() { return loginRepo.findAll(); }
+    public List<LoginEvent> getSuspiciousLogins(Long userId) {
+        return loginRepo.findByUserIdAndLoginStatus(userId, "FAILED");
+    }
+
+    @Override public List<LoginEvent> getAllEvents() { return loginRepo.findAll(); }
 }
