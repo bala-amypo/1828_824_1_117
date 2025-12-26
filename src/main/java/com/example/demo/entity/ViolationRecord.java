@@ -1,50 +1,30 @@
 package com.example.demo.entity;
-
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
 import java.time.LocalDateTime;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
 @Entity
-@Table(name = "violation_records")
 public class ViolationRecord {
-    
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    
-    @Column(nullable = false)
     private Long userId;
-    
-    @Column(nullable = false)
-    private Long policyRuleId;
-    
-    @Column(nullable = false)
     private Long eventId;
-    
-    @Column(nullable = false)
-    private String violationType;
-    
-    @Column(columnDefinition = "TEXT")
+    private String severity;
     private String details;
-    
-    @Column(nullable = false)
-    private String severity; 
-    
-    @Column(nullable = false)
+    private Boolean resolved;
     private LocalDateTime detectedAt;
-    
-    @Column(nullable = false)
-    private Boolean resolved = false;
-    
-    @PrePersist
-    protected void onCreate() {
-        if (detectedAt == null) {
-            detectedAt = LocalDateTime.now();
-        }
-    }
+
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+    public Long getUserId() { return userId; }
+    public void setUserId(Long userId) { this.userId = userId; }
+    public Long getEventId() { return eventId; }
+    public void setEventId(Long eventId) { this.eventId = eventId; }
+    public String getSeverity() { return severity; }
+    public void setSeverity(String severity) { this.severity = severity; }
+    public String getDetails() { return details; }
+    public void setDetails(String details) { this.details = details; }
+    public Boolean getResolved() { return resolved; }
+    public void setResolved(Boolean resolved) { this.resolved = resolved; }
+    public LocalDateTime getDetectedAt() { return detectedAt; }
+    public void setDetectedAt(LocalDateTime detectedAt) { this.detectedAt = detectedAt; }
 }

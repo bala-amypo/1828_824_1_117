@@ -1,39 +1,19 @@
 package com.example.demo.security;
-
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.*;
 import java.util.Date;
 
 public class JwtUtil {
     private String secret;
     private long validity;
 
-    // Constructor required by Step 0.4 and the Master Test Suite
-    public JwtUtil(String secret, long validityInMs, boolean isTestMode) {
+    public JwtUtil(String secret, long validity, boolean testMode) {
         this.secret = secret;
-        this.validity = validityInMs;
+        this.validity = validity;
     }
 
-    public String getSubject(String token) {
-        return getClaims(token).getSubject();
-    }
-
-    public String getEmail(String token) {
-        return getClaims(token).get("email", String.class);
-    }
-
-    public String getRole(String token) {
-        return getClaims(token).get("role", String.class);
-    }
-
-    public Long getUserId(String token) {
-        return getClaims(token).get("userId", Long.class);
-    }
-
-    public String generateToken(String username, Long userId, String email, String role) {
+    public String generateToken(String sub, Long userId, String email, String role) {
         return Jwts.builder()
-                .setSubject(username)
+                .setSubject(sub)
                 .claim("userId", userId)
                 .claim("email", email)
                 .claim("role", role)
@@ -47,10 +27,13 @@ public class JwtUtil {
         try {
             Jwts.parser().setSigningKey(secret).parseClaimsJws(token);
             return true;
-        } catch (Exception e) {
-            return false;
-        }
+        } catch (Exception e) { return false; }
     }
+
+    public String getSubject(String t) { return getClaims(t).getSubject(); }
+    public String getEmail(String t) { return getClaims(t).get("email", String.class); }
+    public String getRole(String t) { return getClaims(t).get("role", String.class); }
+    public Long getUserId(String t) { return getClaims(t).get("userId", Long.class); }
 
     private Claims getClaims(String token) {
         return Jwts.parser().setSigningKey(secret).parseClaimsJws(token).getBody();

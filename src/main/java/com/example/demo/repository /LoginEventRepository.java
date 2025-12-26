@@ -5,5 +5,5 @@ import java.util.List;
 
 public interface LoginEventRepository extends JpaRepository<LoginEvent, Long> {
     List<LoginEvent> findByUserId(Long userId);
-    List<LoginEvent> findByUserIdAndLoginStatus(Long userId, String status);
+    List<LoginEvent> findByUserIdAndLoginStatus(Long userId, String loginStatus);
 }

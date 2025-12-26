@@ -1,5 +1,4 @@
 package com.example.demo.util;
-
 import com.example.demo.entity.*;
 import com.example.demo.repository.*;
 import java.time.LocalDateTime;
@@ -20,7 +19,6 @@ public class RuleEvaluationUtil {
                 v.setUserId(event.getUserId());
                 v.setEventId(event.getId());
                 v.setSeverity(rule.getSeverity());
-                v.setDetails("Policy Violation: " + rule.getRuleCode());
                 v.setDetectedAt(LocalDateTime.now());
                 v.setResolved(false);
                 violationRepo.save(v);
