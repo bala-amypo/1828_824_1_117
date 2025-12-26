@@ -1,19 +1,56 @@
+package com.example.demo.service.impl;
+
+import com.example.demo.entity.LoginEvent;
+import com.example.demo.repository.LoginEventRepository;
+import com.example.demo.service.LoginEventService;
+import com.example.demo.util.RuleEvaluationUtil;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+
 @Service
 public class LoginEventServiceImpl implements LoginEventService {
-    private final LoginEventRepository loginRepo;
-    private final RuleEvaluationUtil ruleEvaluator;
 
-    // ORDER MATTERS: LoginEventRepository first, then RuleEvaluationUtil
-    public LoginEventServiceImpl(LoginEventRepository loginRepo, RuleEvaluationUtil ruleEvaluator) {
-        this.loginRepo = loginRepo;
-        this.ruleEvaluator = ruleEvaluator;
+    private final LoginEventRepository loginEventRepository;
+    private final RuleEvaluationUtil ruleEvaluationUtil;
+
+    /**
+     * STEP 0.5 - Service Constructor Signatures:
+     * LogicEventService must accept dependencies in this EXACT order:
+     * 1. LoginEventRepository
+     * 2. RuleEvaluationUtil
+     */
+    public LoginEventServiceImpl(LoginEventRepository loginEventRepository, RuleEvaluationUtil ruleEvaluationUtil) {
+        this.loginEventRepository = loginEventRepository;
+        this.ruleEvaluationUtil = ruleEvaluationUtil;
     }
 
     @Override
     public LoginEvent recordLogin(LoginEvent event) {
-        LoginEvent saved = loginRepo.save(event);
-        ruleEvaluator.evaluateLoginEvent(saved); // Trigger logic engine
-        return saved;
+        // Save the event first to generate an ID
+        LoginEvent savedEvent = loginEventRepository.save(event);
+        
+        // STEP 0.3 - Rule Evaluation:
+        // Pass the event to the logic engine to check for policy violations
+        ruleEvaluationUtil.evaluateLoginEvent(savedEvent);
+        
+        return savedEvent;
     }
-    // ... other methods
+
+    @Override
+    public List<LoginEvent> getEventsByUser(Long userId) {
+        // Uses the custom repository method signature from Step 1
+        return loginEventRepository.findByUserId(userId);
+    }
+
+    @Override
+    public List<LoginEvent> getSuspiciousLogins(Long userId) {
+        // STEP 1 - Exact Naming Required: findByUserIdAndLoginStatus
+        return loginEventRepository.findByUserIdAndLoginStatus(userId, "FAILED");
+    }
+
+    @Override
+    public List<LoginEvent> getAllEvents() {
+        return loginEventRepository.findAll();
+    }
 }
