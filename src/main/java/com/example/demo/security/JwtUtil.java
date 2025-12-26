@@ -9,9 +9,26 @@ public class JwtUtil {
     private String secret;
     private long validity;
 
+    // Constructor required by Step 0.4 and the Master Test Suite
     public JwtUtil(String secret, long validityInMs, boolean isTestMode) {
         this.secret = secret;
         this.validity = validityInMs;
+    }
+
+    public String getSubject(String token) {
+        return getClaims(token).getSubject();
+    }
+
+    public String getEmail(String token) {
+        return getClaims(token).get("email", String.class);
+    }
+
+    public String getRole(String token) {
+        return getClaims(token).get("role", String.class);
+    }
+
+    public Long getUserId(String token) {
+        return getClaims(token).get("userId", Long.class);
     }
 
     public String generateToken(String username, Long userId, String email, String role) {
@@ -30,13 +47,10 @@ public class JwtUtil {
         try {
             Jwts.parser().setSigningKey(secret).parseClaimsJws(token);
             return true;
-        } catch (Exception e) { return false; }
+        } catch (Exception e) {
+            return false;
+        }
     }
-
-    public String getSubject(String token) { return getClaims(token).getSubject(); }
-    public String getEmail(String token) { return getClaims(token).get("email", String.class); }
-    public String getRole(String token) { return getClaims(token).get("role", String.class); }
-    public Long getUserId(String token) { return getClaims(token).get("userId", Long.class); }
 
     private Claims getClaims(String token) {
         return Jwts.parser().setSigningKey(secret).parseClaimsJws(token).getBody();
