@@ -4,13 +4,12 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import java.util.Date;
-import java.util.function.Function;
 
 public class JwtUtil {
     private String secret;
     private long validity;
 
-    // STEP 0.4 - Mandatory Constructor for Test Suite
+    // STEP 0.4 - Constructor signature required by the test suite
     public JwtUtil(String secret, long validityInMs, boolean isTestMode) {
         this.secret = secret;
         this.validity = validityInMs;
@@ -32,34 +31,23 @@ public class JwtUtil {
         try {
             Jwts.parser().setSigningKey(secret).parseClaimsJws(token);
             return true;
-        } catch (Exception e) {
-            return false;
-        }
+        } catch (Exception e) { return false; }
     }
 
-    public String getSubject(String token) {
-        return extractClaim(token, Claims::getSubject);
-    }
-
-    // FIX: Required by Test Suite Priority 345, 351, 357
+    // These getters are required to pass Priority 30, 31, and 32
     public String getEmail(String token) {
-        return extractAllClaims(token).get("email", String.class);
+        return getClaims(token).get("email", String.class);
     }
 
     public String getRole(String token) {
-        return extractAllClaims(token).get("role", String.class);
+        return getClaims(token).get("role", String.class);
     }
 
     public Long getUserId(String token) {
-        return extractAllClaims(token).get("userId", Long.class);
+        return getClaims(token).get("userId", Long.class);
     }
 
-    private <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
-        final Claims claims = extractAllClaims(token);
-        return claimsResolver.apply(claims);
-    }
-
-    private Claims extractAllClaims(String token) {
+    private Claims getClaims(String token) {
         return Jwts.parser().setSigningKey(secret).parseClaimsJws(token).getBody();
     }
 }
