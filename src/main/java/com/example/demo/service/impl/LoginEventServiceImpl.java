@@ -9,6 +9,7 @@ import java.util.List;
 
 @Service
 public class LoginEventServiceImpl implements LoginEventService {
+
     private final LoginEventRepository loginRepo;
     private final RuleEvaluationUtil ruleEvaluator;
 
@@ -19,9 +20,13 @@ public class LoginEventServiceImpl implements LoginEventService {
 
     @Override
     public LoginEvent recordLogin(LoginEvent event) {
-        LoginEvent saved = loginRepo.save(event);
-        ruleEvaluator.evaluateLoginEvent(saved);
-        return saved;
+        // 1. Save the login event first
+        LoginEvent savedEvent = loginRepo.save(event);
+        
+        // 2. Evaluate rules against the saved event
+        ruleEvaluator.evaluateLoginEvent(savedEvent);
+        
+        return savedEvent;
     }
 
     @Override
@@ -34,7 +39,6 @@ public class LoginEventServiceImpl implements LoginEventService {
         return loginRepo.findByUserIdAndLoginStatus(userId, "FAILED");
     }
 
-    // FIX: Add missing method required by interface
     @Override
     public List<LoginEvent> getAllEvents() {
         return loginRepo.findAll();
