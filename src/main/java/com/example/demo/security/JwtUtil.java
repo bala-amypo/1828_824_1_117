@@ -9,38 +9,67 @@ import java.util.function.Function;
 
 @Component
 public class JwtUtil {
-    private String secret = "your_secret_key_here"; // Use the one from your config
+    private String secret = "TestSecretKeyForJWT1234567890"; 
     private long validityInMs = 3600000; // 1 hour
 
-    // Required Constructor by Technical Constraints
+    // Required Constructor for Spring DI
     public JwtUtil() {}
     
+    // Required Constructor by Master Test Suite (Step 0.4)
     public JwtUtil(String secret, long validityInMs, boolean isTestMode) {
         this.secret = secret;
         this.validityInMs = validityInMs;
     }
 
-    // --- FIX: Add these methods to resolve "cannot find symbol" errors ---
+    // --- TOKEN GENERATION ---
+    public String generateToken(String username, Long userId, String email, String role) {
+        return Jwts.builder()
+                .setSubject(username)
+                .claim("userId", userId)
+                .claim("email", email)
+                .claim("role", role)
+                .setIssuedAt(new Date(System.currentTimeMillis()))
+                .setExpiration(new Date(System.currentTimeMillis() + validityInMs))
+                .signWith(SignatureAlgorithm.HS256, secret)
+                .compact();
+    }
+
+    // --- VALIDATION ---
+    public boolean validateToken(String token) {
+        try {
+            Jwts.parser().setSigningKey(secret).parseClaimsJws(token);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    // --- EXTRACTION METHODS (Resolves "cannot find symbol" errors) ---
+
+    public String getSubject(String token) {
+        return getClaimFromToken(token, Claims::getSubject);
+    }
 
     public String getEmail(String token) {
-        return getClaimFromToken(token, Claims::getSubject);
+        // The test suite expects the "email" claim specifically
+        final Claims claims = getAllClaimsFromToken(token);
+        return claims.get("email", String.class);
     }
 
     public String getRole(String token) {
         final Claims claims = getAllClaimsFromToken(token);
-        return (String) claims.get("role");
+        return claims.get("role", String.class);
     }
 
     public Long getUserId(String token) {
         final Claims claims = getAllClaimsFromToken(token);
-        // Ensure you handle the numeric conversion safely
         Object userId = claims.get("userId");
         if (userId instanceof Integer) return ((Integer) userId).longValue();
         if (userId instanceof Long) return (Long) userId;
         return null;
     }
 
-    // --- Helper Methods ---
+    // --- HELPER METHODS ---
 
     public <T> T getClaimFromToken(String token, Function<Claims, T> claimsResolver) {
         final Claims claims = getAllClaimsFromToken(token);
@@ -48,8 +77,9 @@ public class JwtUtil {
     }
 
     private Claims getAllClaimsFromToken(String token) {
-        return Jwts.parser().setSigningKey(secret).parseClaimsJws(token).getBody();
+        return Jwts.parser()
+                .setSigningKey(secret)
+                .parseClaimsJws(token)
+                .getBody();
     }
-    
-    // ... include your generateToken and validateToken methods here
 }
