@@ -11,34 +11,35 @@ import java.util.Optional;
 @Service
 public class DeviceProfileServiceImpl implements DeviceProfileService {
 
-    private final DeviceProfileRepository deviceRepo;
+    private final DeviceProfileRepository deviceProfileRepository;
 
-    public DeviceProfileServiceImpl(DeviceProfileRepository deviceRepo) {
-        this.deviceRepo = deviceRepo;
+    // STEP 0.5 - Exact Constructor order
+    public DeviceProfileServiceImpl(DeviceProfileRepository deviceProfileRepository) {
+        this.deviceProfileRepository = deviceProfileRepository;
     }
 
     @Override
     public DeviceProfile registerDevice(DeviceProfile device) {
         device.setLastSeen(LocalDateTime.now());
-        return deviceRepo.save(device);
+        return deviceProfileRepository.save(device);
     }
 
     @Override
     public DeviceProfile updateTrustStatus(Long id, boolean trust) {
-        return deviceRepo.findById(id).map(device -> {
-            device.setIsTrusted(trust);
-            device.setLastSeen(LocalDateTime.now());
-            return deviceRepo.save(device);
+        return deviceProfileRepository.findById(id).map(d -> {
+            d.setIsTrusted(trust);
+            return deviceProfileRepository.save(d);
         }).orElse(null);
     }
 
     @Override
     public List<DeviceProfile> getDevicesByUser(Long userId) {
-        return deviceRepo.findByUserId(userId);
+        return deviceProfileRepository.findByUserId(userId);
     }
 
     @Override
     public Optional<DeviceProfile> findByDeviceId(String deviceId) {
-        return deviceRepo.findByDeviceId(deviceId);
+        // STEP 1 - Exact repository method naming
+        return deviceProfileRepository.findByDeviceId(deviceId);
     }
 }
